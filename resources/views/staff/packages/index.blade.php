@@ -1,418 +1,205 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Paket - Staff Area</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .package-card {
-            transition: transform 0.3s;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .package-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .price-tag {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #28a745;
-        }
-        .badge-included {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-        }
-        .badge-excluded {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-        }
-        .event-info {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('staff.dashboard') }}">
-                <i class="fas fa-running"></i> Marathon System
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('staff.dashboard') }}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('staff.events.index') }}">
-                            <i class="fas fa-calendar-alt"></i> Event
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('staff.registrations.index') }}">
-                            <i class="fas fa-users"></i> Pendaftaran
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('staff.payments.index') }}">
-                            <i class="fas fa-credit-card"></i> Pembayaran
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown active">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-box"></i> Paket
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item active" href="{{ route('staff.packages.index') }}">Semua Paket</a></li>
-                            <li><a class="dropdown-item" href="{{ route('staff.packages.create') }}">Tambah Paket Baru</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('logout') }}">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
+@extends('layouts.staff')
+
+@section('title', 'Kelola Paket - Staff Area')
+@section('page-title', 'Kelola Paket Event')
+
+@section('content')
+<div class="space-y-6 animate-fade-in">
+    
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-black text-slate-800 tracking-tight">Daftar Paket Lomba</h2>
+            <p class="text-xs text-slate-400 font-medium uppercase tracking-tighter">Kelola kategori harga dan fasilitas peserta</p>
         </div>
-    </nav>
+        <a href="{{ route('staff.packages.create') }}" class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-2xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-1">
+            <i class="fas fa-plus mr-2"></i> TAMBAH PAKET BARU
+        </a>
+    </div>
 
-    <!-- Main Content -->
-    <div class="container mt-4">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3">
-                <i class="fas fa-boxes text-primary"></i> Kelola Paket Event
-            </h1>
-            <a href="{{ route('staff.packages.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Tambah Paket Baru
-            </a>
-        </div>
-
-        <!-- Success/Error Messages -->
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-blue-500 transition-all">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Paket</p>
+                <h3 class="text-3xl font-black text-slate-800 mt-1">{{ $stats['total'] }}</h3>
             </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card text-white bg-primary">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title">Total Paket</h6>
-                                <h3>{{ $stats['total'] }}</h3>
-                            </div>
-                            <i class="fas fa-box fa-3x opacity-50"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-success">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title">Dengan Race Kit</h6>
-                                <h3>{{ $stats['with_race_kit'] }}</h3>
-                            </div>
-                            <i class="fas fa-gift fa-3x opacity-50"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-warning">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title">Dengan Medali</h6>
-                                <h3>{{ $stats['with_medal'] }}</h3>
-                            </div>
-                            <i class="fas fa-medal fa-3x opacity-50"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-info">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title">Dengan Kaos</h6>
-                                <h3>{{ $stats['with_shirt'] }}</h3>
-                            </div>
-                            <i class="fas fa-tshirt fa-3x opacity-50"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="p-4 bg-blue-50 text-blue-600 rounded-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <i class="fas fa-box text-xl"></i>
             </div>
         </div>
 
-        <!-- Search and Filter -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form action="{{ route('staff.packages.index') }}" method="GET">
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <input type="text" name="search" class="form-control" 
-                                   placeholder="Cari nama paket atau event..." 
-                                   value="{{ request('search') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-search"></i> Cari
-                            </button>
-                        </div>
-                    </div>
-                </form>
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Race Kit</p>
+                <h3 class="text-3xl font-black text-emerald-600 mt-1">{{ $stats['with_race_kit'] }}</h3>
+            </div>
+            <div class="p-4 bg-emerald-50 text-emerald-600 rounded-2xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <i class="fas fa-gift text-xl"></i>
             </div>
         </div>
 
-        <!-- Packages Table -->
-        <div class="card">
-            <div class="card-body">
-                @if($packages->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Nama Paket</th>
-                                    <th>Event</th>
-                                    <th>Fasilitas</th>
-                                    <th>Harga</th>
-                                    <th>Tanggal Event</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($packages as $package)
-                                    <tr>
-                                        <td>{{ $loop->iteration + (($packages->currentPage() - 1) * $packages->perPage()) }}</td>
-                                        <td>
-                                            <strong>{{ $package->nama }}</strong>
-                                            <div class="text-muted small">ID: {{ $package->id }}</div>
-                                        </td>
-                                        <td>
-                                            <strong>{{ $package->event_nama }}</strong>
-                                            <div class="text-muted small">
-                                                {{ date('d/m/Y', strtotime($package->tanggal)) }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex flex-wrap gap-1">
-                                                @if($package->termasuk_race_kit)
-                                                    <span class="badge-included">
-                                                        <i class="fas fa-gift"></i> Race Kit
-                                                    </span>
-                                                @else
-                                                    <span class="badge-excluded">
-                                                        <i class="fas fa-gift"></i> Race Kit
-                                                    </span>
-                                                @endif
-                                                
-                                                @if($package->termasuk_medali)
-                                                    <span class="badge-included">
-                                                        <i class="fas fa-medal"></i> Medali
-                                                    </span>
-                                                @else
-                                                    <span class="badge-excluded">
-                                                        <i class="fas fa-medal"></i> Medali
-                                                    </span>
-                                                @endif
-                                                
-                                                @if($package->termasuk_kaos)
-                                                    <span class="badge-included">
-                                                        <i class="fas fa-tshirt"></i> Kaos
-                                                    </span>
-                                                @else
-                                                    <span class="badge-excluded">
-                                                        <i class="fas fa-tshirt"></i> Kaos
-                                                    </span>
-                                                @endif
-                                                
-                                                @if($package->termasuk_sertifikat)
-                                                    <span class="badge-included">
-                                                        <i class="fas fa-certificate"></i> Sertifikat
-                                                    </span>
-                                                @else
-                                                    <span class="badge-excluded">
-                                                        <i class="fas fa-certificate"></i> Sertifikat
-                                                    </span>
-                                                @endif
-                                                
-                                                @if($package->termasuk_snack)
-                                                    <span class="badge-included">
-                                                        <i class="fas fa-utensils"></i> Snack
-                                                    </span>
-                                                @else
-                                                    <span class="badge-excluded">
-                                                        <i class="fas fa-utensils"></i> Snack
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td class="price-tag">
-                                            Rp {{ number_format($package->harga, 0, ',', '.') }}
-                                        </td>
-                                        <td>
-                                            {{ date('d/m/Y', strtotime($package->tanggal)) }}
-                                            <div class="text-muted small">
-                                                {{ date('H:i', strtotime($package->created_at)) }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('staff.packages.edit', $package->id) }}" 
-                                                   class="btn btn-outline-primary" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <button type="button" class="btn btn-outline-info" title="Detail">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted">
-                            Menampilkan {{ $packages->firstItem() }} - {{ $packages->lastItem() }} dari {{ $packages->total() }} paket
-                        </div>
-                        <div>
-                            {{ $packages->links() }}
-                        </div>
-                    </div>
-                @else
-                    <div class="text-center py-5">
-                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">Belum ada paket</h5>
-                        <p class="text-muted">Mulai dengan menambahkan paket pertama Anda</p>
-                        <a href="{{ route('staff.packages.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Tambah Paket Pertama
-                        </a>
-                    </div>
-                @endif
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-orange-500 transition-all">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Medali</p>
+                <h3 class="text-3xl font-black text-orange-500 mt-1">{{ $stats['with_medal'] }}</h3>
+            </div>
+            <div class="p-4 bg-orange-50 text-orange-600 rounded-2xl group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                <i class="fas fa-medal text-xl"></i>
             </div>
         </div>
 
-        <!-- Summary Card -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="fas fa-chart-pie text-primary"></i> Ringkasan Fasilitas
-                </h5>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <h6>Distribusi Fasilitas</h6>
-                            <div class="progress mb-2" style="height: 20px;">
-                                <div class="progress-bar bg-success" style="width: {{ $stats['total'] > 0 ? ($stats['with_race_kit'] / $stats['total'] * 100) : 0 }}%">
-                                    Race Kit: {{ $stats['with_race_kit'] }}
-                                </div>
-                            </div>
-                            <div class="progress mb-2" style="height: 20px;">
-                                <div class="progress-bar bg-warning" style="width: {{ $stats['total'] > 0 ? ($stats['with_medal'] / $stats['total'] * 100) : 0 }}%">
-                                    Medali: {{ $stats['with_medal'] }}
-                                </div>
-                            </div>
-                            <div class="progress mb-2" style="height: 20px;">
-                                <div class="progress-bar bg-info" style="width: {{ $stats['total'] > 0 ? ($stats['with_shirt'] / $stats['total'] * 100) : 0 }}%">
-                                    Kaos: {{ $stats['with_shirt'] }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Informasi Penting</h6>
-                        <ul class="list-unstyled">
-                            <li class="mb-2">
-                                <i class="fas fa-info-circle text-primary"></i>
-                                <strong>Total Paket:</strong> {{ $stats['total'] }}
-                            </li>
-                            <li class="mb-2">
-                                <i class="fas fa-check-circle text-success"></i>
-                                <strong>Paket dengan Race Kit:</strong> {{ $stats['with_race_kit'] }}
-                            </li>
-                            <li class="mb-2">
-                                <i class="fas fa-check-circle text-warning"></i>
-                                <strong>Paket dengan Medali:</strong> {{ $stats['with_medal'] }}
-                            </li>
-                            <li class="mb-2">
-                                <i class="fas fa-check-circle text-info"></i>
-                                <strong>Paket dengan Kaos:</strong> {{ $stats['with_shirt'] }}
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-sky-500 transition-all">
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kaos/Jersey</p>
+                <h3 class="text-3xl font-black text-sky-600 mt-1">{{ $stats['with_shirt'] }}</h3>
+            </div>
+            <div class="p-4 bg-sky-50 text-sky-600 rounded-2xl group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                <i class="fas fa-tshirt text-xl"></i>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="mt-5 py-3 bg-light border-top">
-        <div class="container text-center">
-            <p class="mb-0 text-muted">
-                &copy; {{ date('Y') }} Marathon System - Staff Area
-            </p>
+    <div class="bg-white border border-slate-200 rounded-3xl shadow-sm p-2">
+        <form action="{{ route('staff.packages.index') }}" method="GET" class="flex items-center">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       class="w-full bg-transparent border-none py-4 pl-12 pr-4 text-sm focus:ring-0 text-slate-600 placeholder:text-slate-300 font-medium"
+                       placeholder="Cari nama paket atau nama event marathon...">
+            </div>
+            <button type="submit" class="px-8 py-3 bg-slate-800 hover:bg-black text-white text-xs font-bold rounded-2xl transition-all mr-2">
+                CARI DATA
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            @if($packages->count() > 0)
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-50/80 border-b border-slate-100">
+                    <tr>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Paket & Event</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fasilitas</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Harga Satuan</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium">
+                    @foreach($packages as $package)
+                    <tr class="hover:bg-blue-50/30 transition-all group">
+                        <td class="px-6 py-5">
+                            <div class="flex items-center">
+                                <div class="h-10 w-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-xs mr-4 shadow-lg shadow-blue-100">
+                                    {{ $loop->iteration }}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-800 leading-tight">{{ $package->nama }}</p>
+                                    <p class="text-[10px] text-blue-500 font-bold uppercase mt-1 tracking-tighter">
+                                        <i class="fas fa-calendar-alt mr-1"></i> {{ $package->event_nama }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="flex flex-wrap gap-1.5 max-w-xs">
+                                {!! $package->termasuk_race_kit ? '<span class="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold rounded-lg border border-emerald-100 tracking-tighter">RACE KIT</span>' : '' !!}
+                                {!! $package->termasuk_medali ? '<span class="px-2 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-bold rounded-lg border border-orange-100 tracking-tighter">MEDALI</span>' : '' !!}
+                                {!! $package->termasuk_kaos ? '<span class="px-2 py-0.5 bg-sky-50 text-sky-600 text-[9px] font-bold rounded-lg border border-sky-100 tracking-tighter">KAOS</span>' : '' !!}
+                                {!! $package->termasuk_snack ? '<span class="px-2 py-0.5 bg-slate-50 text-slate-500 text-[9px] font-bold rounded-lg border border-slate-100 tracking-tighter">SNACK</span>' : '' !!}
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 text-right">
+                            <span class="text-sm font-black text-emerald-600 leading-none">Rp {{ number_format($package->harga, 0, ',', '.') }}</span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="flex justify-center items-center space-x-2">
+                                <a href="{{ route('staff.packages.edit', $package->id) }}" class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                                    <i class="fas fa-edit text-sm"></i>
+                                </a>
+                                <button class="p-2.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all">
+                                    <i class="fas fa-eye text-sm"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            @else
+            <div class="py-24 text-center">
+                <div class="h-20 w-20 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-box-open text-3xl"></i>
+                </div>
+                <h5 class="text-slate-700 font-black tracking-tight">Tidak Ada Paket Ditemukan</h5>
+                <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-bold">Silakan tambahkan paket untuk event mendatang</p>
+            </div>
+            @endif
         </div>
-    </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(() => {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
+        @if($packages->hasPages())
+        <div class="p-6 bg-slate-50 border-t border-slate-100">
+            <div class="tailwind-pagination">
+                {{ $packages->links() }}
+            </div>
+        </div>
+        @endif
+    </div>
 
-        // Auto-focus on search input
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.querySelector('input[name="search"]');
-            if (searchInput) {
-                searchInput.focus();
-            }
-        });
-    </script>
-</body>
-</html>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white border border-slate-200 rounded-3xl shadow-sm p-8">
+            <h5 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center">
+                <i class="fas fa-chart-bar mr-3 text-blue-500"></i> Distribusi Fasilitas
+            </h5>
+            <div class="space-y-6">
+                @php
+                    $features = [
+                        ['label' => 'Race Kit', 'count' => $stats['with_race_kit'], 'color' => 'bg-emerald-500'],
+                        ['label' => 'Medali Juara', 'count' => $stats['with_medal'], 'color' => 'bg-orange-500'],
+                        ['label' => 'Kaos Event', 'count' => $stats['with_shirt'], 'color' => 'bg-sky-500'],
+                    ];
+                @endphp
+
+                @foreach($features as $f)
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-[11px] font-black uppercase tracking-wider">
+                        <span class="text-slate-500">{{ $f['label'] }}</span>
+                        <span class="text-slate-800">{{ $f['count'] }} Paket</span>
+                    </div>
+                    <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div class="{{ $f['color'] }} h-full transition-all duration-1000 shadow-sm" 
+                             style="width: {{ $stats['total'] > 0 ? ($f['count'] / $stats['total'] * 100) : 0 }}%"></div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="bg-slate-800 rounded-3xl p-8 shadow-xl text-white relative overflow-hidden group">
+            <i class="fas fa-info-circle absolute -top-4 -right-4 text-9xl text-white/5 group-hover:rotate-12 transition-transform"></i>
+            <h5 class="text-sm font-black uppercase tracking-widest mb-6 flex items-center">
+                <i class="fas fa-lightbulb mr-3 text-yellow-400"></i> Informasi Strategis
+            </h5>
+            <ul class="space-y-4 relative z-10">
+                <li class="flex items-start bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <div class="h-8 w-8 bg-blue-500 text-white rounded-lg flex items-center justify-center shrink-0 mr-4 font-bold text-xs">1</div>
+                    <p class="text-xs font-medium text-slate-300 leading-relaxed">Pastikan harga paket sudah termasuk margin biaya operasional dan vendor.</p>
+                </li>
+                <li class="flex items-start bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <div class="h-8 w-8 bg-emerald-500 text-white rounded-lg flex items-center justify-center shrink-0 mr-4 font-bold text-xs">2</div>
+                    <p class="text-xs font-medium text-slate-300 leading-relaxed">Paket dengan <span class="text-emerald-400 font-bold uppercase tracking-tighter">Medali</span> biasanya memiliki minat pendaftaran 40% lebih tinggi.</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tailwind-pagination nav div:first-child { display: none; }
+    .tailwind-pagination nav span, .tailwind-pagination nav a { 
+        padding: 8px 16px; border-radius: 12px; margin: 0 2px; font-size: 10px; font-weight: 900; transition: all 0.3s;
+    }
+    .tailwind-pagination nav a { background: white; border: 1px solid #e2e8f0; color: #64748b; }
+    .tailwind-pagination nav a:hover { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+    .tailwind-pagination nav span[aria-current="page"] span { background: #2563eb; color: white; border-color: #2563eb; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); }
+</style>
+@endsection

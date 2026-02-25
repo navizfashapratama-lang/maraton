@@ -522,8 +522,16 @@
         </div>
     </div>
     
-    <div class="p-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+   <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Dashboard Admin</h2>
+            <p class="text-lg text-gray-600">Kelola semua aktivitas marathon Anda dengan mudah</p>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
             @php
                 $actions = [
                     [
@@ -554,15 +562,6 @@
                         'gradient' => 'from-cyan-500 to-cyan-600'
                     ],
                     [
-                        'color' => 'orange',
-                        'icon' => 'chart-line',
-                        'title' => 'Laporan',
-                        'description' => 'Lihat laporan lengkap',
-                        'badge' => 'Report',
-                        'route' => 'admin.payments.index',
-                        'gradient' => 'from-orange-500 to-orange-600'
-                    ],
-                    [
                         'color' => 'purple',
                         'icon' => 'external-link-alt',
                         'title' => 'Website',
@@ -583,48 +582,55 @@
                 
                 <a href="{{ $href }}"
                    @if($isExternal) target="_blank" @endif
-                   class="group block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1"
+                   class="group w-full max-w-sm bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-2"
                    data-aos="zoom-in"
                    data-aos-delay="{{ $index * 100 }}">
                     
-                    <div class="p-6 text-center">
-                        <!-- Icon -->
-                        <div class="mb-5">
-                            <div class="w-20 h-20 rounded-full bg-gradient-to-r {{ $action['gradient'] }} flex items-center justify-center text-white text-2xl shadow-lg mx-auto group-hover:scale-110 transition-transform duration-300">
+                    <div class="p-8 text-center">
+                        <!-- Icon with floating effect -->
+                        <div class="relative mb-6">
+                            <div class="absolute inset-0 bg-gradient-to-r {{ $action['gradient'] }} rounded-full opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-300"></div>
+                            <div class="relative w-24 h-24 mx-auto rounded-full bg-gradient-to-r {{ $action['gradient'] }} flex items-center justify-center text-white text-3xl shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                                 <i class="fas fa-{{ $action['icon'] }}"></i>
                             </div>
                         </div>
                         
-                        <!-- Title -->
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2 group-hover:text-gray-900 transition-colors duration-300">
+                        <!-- Content -->
+                        <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-900 transition-colors duration-300">
                             {{ $action['title'] }}
                         </h3>
                         
-                        <!-- Description -->
-                        <p class="text-gray-600 text-sm mb-4 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                        <p class="text-gray-600 text-sm mb-5 leading-relaxed">
                             {{ $action['description'] }}
                         </p>
                         
-                        <!-- Badge -->
-                        <span class="inline-block px-3 py-1 rounded-full text-xs font-medium bg-{{ $action['color'] }}-50 text-{{ $action['color'] }}-700 border border-{{ $action['color'] }}-200 group-hover:bg-{{ $action['color'] }}-100 group-hover:border-{{ $action['color'] }}-300 transition-colors duration-300">
+                        <!-- Badge with improved styling -->
+                        <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold bg-{{ $action['color'] }}-50 text-{{ $action['color'] }}-700 border-2 border-{{ $action['color'] }}-200 group-hover:bg-{{ $action['color'] }}-100 group-hover:border-{{ $action['color'] }}-300 transition-all duration-300 shadow-sm">
                             {{ $action['badge'] }}
                         </span>
                         
-                        <!-- Action Indicator -->
-                        <div class="mt-5 pt-4 border-t border-gray-100 group-hover:border-gray-200 transition-colors duration-300">
-                            <div class="text-xs text-gray-500 flex items-center justify-center group-hover:text-gray-600 transition-colors duration-300">
+                        <!-- Action Indicator with animation -->
+                        <div class="mt-6 pt-5 border-t-2 border-gray-100 group-hover:border-gray-200 transition-colors duration-300">
+                            <div class="text-xs text-gray-500 flex items-center justify-center gap-2 group-hover:text-gray-700 transition-colors duration-300">
                                 @if($isExternal)
-                                    <i class="fas fa-external-link-alt mr-2"></i>
-                                    <span>Buka di tab baru</span>
+                                    <i class="fas fa-external-link-alt text-sm"></i>
+                                    <span class="font-medium">Buka di tab baru</span>
+                                    <i class="fas fa-arrow-right text-sm transform group-hover:translate-x-1 transition-transform duration-300"></i>
                                 @else
-                                    <i class="fas fa-arrow-right mr-2"></i>
-                                    <span>Klik untuk membuka</span>
+                                    <i class="fas fa-arrow-right text-sm"></i>
+                                    <span class="font-medium">Klik untuk membuka</span>
+                                    <i class="fas fa-arrow-right text-sm transform group-hover:translate-x-1 transition-transform duration-300"></i>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </a>
             @endforeach
+        </div>
+
+        <!-- Footer Info -->
+        <div class="text-center mt-12 text-gray-500 text-sm">
+            <p>© 2024 Marathon Management System. All rights reserved.</p>
         </div>
     </div>
 </div>

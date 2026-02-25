@@ -71,6 +71,10 @@
             animation: slideInDown 0.5s ease-out;
         }
         
+        .reset-animation {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
         @keyframes slideInDown {
             from {
                 transform: translateY(-20px);
@@ -80,6 +84,25 @@
                 transform: translateY(0);
                 opacity: 1;
             }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
     </style>
 </head>
@@ -127,6 +150,19 @@
             
             <!-- Card Body -->
             <div class="p-8">
+                <!-- Pesan Reset Berhasil -->
+                <div id="reset-notification" class="hidden reset-animation mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 shadow-sm">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-sync-alt text-blue-500 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-blue-800 mb-2">Form Telah Direset!</h3>
+                            <p class="text-blue-700">Form telah dikosongkan. Anda dapat menambahkan pengguna baru lainnya.</p>
+                        </div>
+                    </div>
+                </div>
+                
                 @if(session('success'))
                 <div id="success-message" class="success-animation mb-8 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 shadow-sm">
                     <div class="flex">
@@ -138,25 +174,17 @@
                             <p class="text-green-700">{{ session('success') }}</p>
                             <div class="mt-3 text-sm text-green-600">
                                 <i class="fas fa-sync-alt mr-2"></i>
-                                <span id="reset-timer">Form akan direset dalam <span id="countdown">5</span> detik...</span>
+                                <span>Form akan direset otomatis...</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        // Mulai countdown untuk auto-reset form
-                        let countdown = 5;
-                        const countdownElement = document.getElementById('countdown');
-                        const countdownInterval = setInterval(function() {
-                            countdown--;
-                            countdownElement.textContent = countdown;
-                            
-                            if (countdown <= 0) {
-                                clearInterval(countdownInterval);
-                                resetFormAfterSubmit();
-                            }
-                        }, 1000);
+                        // Auto reset form setelah 2 detik
+                        setTimeout(function() {
+                            resetFormAfterSubmit();
+                        }, 2000);
                     });
                 </script>
                 @endif
@@ -175,7 +203,7 @@
                 </div>
                 @endif
                 
-                <form method="POST" action="{{ route('admin.users.store') }}" id="createUserForm" onsubmit="handleFormSubmit(event)">
+                <form method="POST" action="{{ route('admin.users.store') }}" id="createUserForm">
                     @csrf
                     
                     <!-- Error Messages -->
@@ -216,7 +244,7 @@
                                     Nama Lengkap <span class="text-red-500">*</span>
                                 </label>
                                 <div class="relative">
-                                    <input type="text" id="nama" name="nama" value="{{ old('nama') }}" 
+                                    <input type="text" id="nama" name="nama" value="{{ old('nama', '') }}" 
                                            class="w-full px-4 py-3 pl-11 border {{ $errors->has('nama') ? 'border-red-300' : 'border-gray-300' }} rounded-lg shadow-sm input-focus transition-all duration-200"
                                            placeholder="Masukkan nama lengkap" required>
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -234,7 +262,7 @@
                                     Email <span class="text-red-500">*</span>
                                 </label>
                                 <div class="relative">
-                                    <input type="email" id="email" name="email" value="{{ old('email') }}" 
+                                    <input type="email" id="email" name="email" value="{{ old('email', '') }}"
                                            class="w-full px-4 py-3 pl-11 border {{ $errors->has('email') ? 'border-red-300' : 'border-gray-300' }} rounded-lg shadow-sm input-focus transition-all duration-200"
                                            placeholder="contoh@email.com" required>
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -357,11 +385,8 @@
                                     <select id="peran" name="peran" 
                                             class="w-full px-4 py-3 pl-11 border {{ $errors->has('peran') ? 'border-red-300' : 'border-gray-300' }} rounded-lg shadow-sm input-focus transition-all duration-200 appearance-none" required>
                                         <option value="">Pilih Peran</option>
-                                        <option value="superadmin" {{ old('peran') == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
-                                        <option value="admin" {{ old('peran') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                        <option value="staff" {{ old('peran') == 'staff' ? 'selected' : '' }}>Staff</option>
-                                        <option value="kasir" {{ old('peran') == 'kasir' ? 'selected' : '' }}>Kasir</option>
-                                        <option value="peserta" {{ old('peran') == 'peserta' ? 'selected' : '' }}>Peserta</option>
+                                        <option value="admin" {{ old('peran', '') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                        <option value="staff" {{ old('peran', '') == 'staff' ? 'selected' : '' }}>Staff</option>
                                     </select>
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-user-tag text-gray-400"></i>
@@ -384,7 +409,7 @@
                                     Nomor Telepon
                                 </label>
                                 <div class="relative">
-                                    <input type="text" id="telepon" name="telepon" value="{{ old('telepon') }}" 
+                                    <input type="text" id="telepon" name="telepon" value="{{ old('telepon', '') }}" 
                                            class="w-full px-4 py-3 pl-11 border {{ $errors->has('telepon') ? 'border-red-300' : 'border-gray-300' }} rounded-lg shadow-sm input-focus transition-all duration-200"
                                            placeholder="0812 3456 7890">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -411,7 +436,7 @@
                         <div class="relative">
                             <textarea id="alamat" name="alamat" rows="3" 
                                       class="w-full px-4 py-3 pl-11 border {{ $errors->has('alamat') ? 'border-red-300' : 'border-gray-300' }} rounded-lg shadow-sm input-focus transition-all duration-200"
-                                      placeholder="Masukkan alamat lengkap (opsional)">{{ old('alamat') }}</textarea>
+                                      placeholder="Masukkan alamat lengkap (opsional)">{{ old('alamat', '') }}</textarea>
                             <div class="absolute top-3 left-3">
                                 <i class="fas fa-home text-gray-400"></i>
                             </div>
@@ -451,7 +476,13 @@
                             </a>
                         </div>
                         
-                        <div class="flex">
+                        <div class="flex space-x-3">
+                            <button type="button" onclick="resetFormManually()" 
+                                    class="inline-flex items-center px-5 py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                                <i class="fas fa-redo mr-2"></i>
+                                Reset Form
+                            </button>
+                            
                             <button type="submit" 
                                     class="inline-flex items-center px-6 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:-translate-y-0.5">
                                 <i class="fas fa-save mr-2"></i>
@@ -470,7 +501,7 @@
                         <span>Data akan disimpan dengan aman dan terenkripsi</span>
                     </div>
                     <div class="flex items-center">
-                        <i class="fas fa-clock mr-2 text-blue-500"></i>
+                        <i class="fas fa-sync-alt mr-2 text-blue-500"></i>
                         <span>Form akan direset otomatis setelah penyimpanan berhasil</span>
                     </div>
                 </div>
@@ -479,9 +510,6 @@
     </div>
     
     <script>
-        // Flag untuk menandai apakah form berhasil disubmit
-        let formSubmittedSuccessfully = false;
-        
         // Toggle password visibility
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
@@ -677,14 +705,29 @@
         function resetFormAfterSubmit() {
             const form = document.getElementById('createUserForm');
             if (form) {
+                // Reset semua input ke nilai default
                 form.reset();
-                // Reset ke nilai default untuk checkbox
+                
+                // Reset checkbox is_active ke checked
                 document.getElementById('is_active').checked = true;
+                
                 // Reset role badge
                 updateRoleBadge('');
-                // Reset password strength indicators
+                
+                // Reset semua indikator password
                 checkPasswordStrength('');
                 checkPasswordMatch();
+                
+                // Reset semua old value
+                const inputs = form.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    if (input.name) {
+                        input.value = input.defaultValue || '';
+                        if (input.type === 'checkbox' && input.name === 'is_active') {
+                            input.checked = true;
+                        }
+                    }
+                });
                 
                 // Hapus pesan sukses jika ada
                 const successMessage = document.getElementById('success-message');
@@ -692,72 +735,53 @@
                     successMessage.style.display = 'none';
                 }
                 
-                // Scroll ke atas form
-                window.scrollTo({top: 0, behavior: 'smooth'});
-                
                 // Tampilkan notifikasi reset
                 showResetNotification();
+                
+                // Fokus ke field pertama
+                document.getElementById('nama').focus();
+                
+                // Scroll ke atas form dengan smooth
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: document.querySelector('.form-card').offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }, 300);
+            }
+        }
+        
+        // Manual reset form
+        function resetFormManually() {
+            if (confirm('Apakah Anda yakin ingin mengosongkan semua field?')) {
+                // Tambahkan efek animasi
+                const form = document.getElementById('createUserForm');
+                form.classList.add('shake');
+                
+                setTimeout(() => {
+                    form.classList.remove('shake');
+                }, 500);
+                
+                resetFormAfterSubmit();
             }
         }
         
         // Tampilkan notifikasi reset form
         function showResetNotification() {
-            // Cek apakah sudah ada notifikasi
-            let notification = document.getElementById('reset-notification');
-            
-            if (!notification) {
-                // Buat notifikasi baru
-                notification = document.createElement('div');
-                notification.id = 'reset-notification';
-                notification.className = 'mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 shadow-sm success-animation';
-                notification.innerHTML = `
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-sync-alt text-blue-500 text-2xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-lg font-semibold text-blue-800 mb-2">Form Telah Direset!</h3>
-                            <p class="text-blue-700">Form telah dikembalikan ke keadaan semula. Anda dapat menambahkan pengguna baru lainnya.</p>
-                        </div>
-                    </div>
-                `;
+            const notification = document.getElementById('reset-notification');
+            if (notification) {
+                notification.classList.remove('hidden');
                 
-                // Sisipkan notifikasi setelah header form
-                const formCard = document.querySelector('.form-card .p-8');
-                if (formCard.firstChild) {
-                    formCard.insertBefore(notification, formCard.firstChild);
-                }
-                
-                // Hapus notifikasi setelah 5 detik
+                // Auto hide setelah 5 detik
                 setTimeout(() => {
-                    if (notification && notification.parentNode) {
-                        notification.style.opacity = '0';
-                        notification.style.transition = 'opacity 0.5s ease';
-                        setTimeout(() => {
-                            if (notification && notification.parentNode) {
-                                notification.parentNode.removeChild(notification);
-                            }
-                        }, 500);
-                    }
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        notification.classList.add('hidden');
+                        notification.style.opacity = '1';
+                    }, 500);
                 }, 5000);
             }
-        }
-        
-        // Handle form submit
-        function handleFormSubmit(event) {
-            // Reset flag
-            formSubmittedSuccessfully = false;
-            
-            // Validasi password match sebelum submit
-            if (!checkPasswordMatch()) {
-                event.preventDefault();
-                alert('Password dan Konfirmasi Password tidak cocok. Silakan periksa kembali.');
-                return false;
-            }
-            
-            // Jika validasi berhasil, set flag
-            formSubmittedSuccessfully = true;
-            return true;
         }
         
         // Event listeners
@@ -793,17 +817,48 @@
                 });
             }
             
-            // Initialize role badge
+            // Initialize role badge dengan old value
             updateRoleBadge(document.getElementById('peran').value);
             
-            // Cek jika ada parameter success di URL (untuk kasus redirect)
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('success') || @json(session('success'))) {
-                // Jika berhasil, tunggu sebentar lalu reset form
+            // Cek jika ada session success, maka auto reset
+            @if(session('success'))
+                // Tunggu 1 detik lalu reset form
                 setTimeout(() => {
                     resetFormAfterSubmit();
-                }, 500);
-            }
+                }, 1000);
+            @endif
+            
+            // Validasi form sebelum submit
+            const form = document.getElementById('createUserForm');
+            form.addEventListener('submit', function(e) {
+                // Validasi password match
+                if (!checkPasswordMatch()) {
+                    e.preventDefault();
+                    alert('Password dan Konfirmasi Password tidak cocok. Silakan periksa kembali.');
+                    
+                    // Tambahkan efek pada password field
+                    const passwordFields = [document.getElementById('password'), 
+                                          document.getElementById('password_confirmation')];
+                    passwordFields.forEach(field => {
+                        field.style.borderColor = '#ef4444';
+                        field.classList.add('shake');
+                        setTimeout(() => {
+                            field.classList.remove('shake');
+                        }, 500);
+                    });
+                    return false;
+                }
+                
+                // Validasi strength password (opsional)
+                const password = document.getElementById('password').value;
+                if (password.length < 6) {
+                    e.preventDefault();
+                    alert('Password minimal 6 karakter.');
+                    return false;
+                }
+                
+                return true;
+            });
         });
     </script>
 </body>

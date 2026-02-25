@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin; 
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -35,11 +36,8 @@ class PenggunaController extends Controller
         // Stats
         $stats = [
             'total' => DB::table('pengguna')->count(),
-            'superadmin' => DB::table('pengguna')->where('peran', 'superadmin')->count(),
             'admin' => DB::table('pengguna')->where('peran', 'admin')->count(),
-            'staff' => DB::table('pengguna')->where('peran', 'staff')->count(),
-            'kasir' => DB::table('pengguna')->where('peran', 'kasir')->count(),
-            'peserta' => DB::table('pengguna')->where('peran', 'peserta')->count(),
+            'staff' => DB::table('pengguna')->where('peran', 'staff')->count(),          
             'aktif' => DB::table('pengguna')->where('is_active', 1)->count(),
             'nonaktif' => DB::table('pengguna')->where('is_active', 0)->count(),
         ];
@@ -65,180 +63,11 @@ class PenggunaController extends Controller
             'nama' => 'required|string|min:2|max:255',
             'email' => 'required|email|unique:pengguna,email',
             'password' => 'required|min:6|confirmed',
-            'peran' => 'required|in:superadmin,admin,staff,kasir,peserta',
+            'peran' => 'required|in:admin,staff',
             'telepon' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
             'is_active' => 'boolean'
         ]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -269,7 +98,8 @@ class PenggunaController extends Controller
                 'created_at' => now()
             ]);
 
-            return redirect()->route('admin.users.index')
+            // Redirect dengan success dan TANPA withInput()
+            return redirect()->route('admin.users.create')
                 ->with('success', 'Pengguna ' . $request->nama . ' berhasil ditambahkan!');
 
         } catch (\Exception $e) {

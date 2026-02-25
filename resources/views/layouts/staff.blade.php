@@ -1,507 +1,255 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Staff Dashboard') - Marathon Events</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Custom Staff CSS -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'marathon-blue': '#1e40af',
+                        'marathon-light': '#00b4d8',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --sidebar-width: 220px;
-            --header-height: 70px;
-            --primary-color: #00b4d8;
-            --secondary-color: #0077b6;
-            --sidebar-bg: #1e3a8a;
-            --sidebar-color: #cbd5e1;
-            --sidebar-active: #00b4d8;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f1f5f9;
-            color: #334155;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: var(--sidebar-bg);
-            color: var(--sidebar-color);
-            transition: all 0.3s;
-            z-index: 1000;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar-header {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar-header .logo {
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            text-decoration: none;
-        }
-        
-        .sidebar-header .logo span {
-            color: var(--primary-color);
-        }
-        
-        .sidebar-menu {
-            padding: 15px 0;
-        }
-        
-        .nav-link {
-            color: var(--sidebar-color);
-            padding: 10px 15px;
-            margin: 3px 10px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        .nav-link:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .nav-link.active {
-            color: white;
-            background: var(--sidebar-active);
-        }
-        
-        .nav-link i {
-            width: 20px;
-            margin-right: 10px;
-            text-align: center;
-        }
-        
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 15px;
-            min-height: 100vh;
-        }
-        
-        /* Header */
-        .header {
-            height: var(--header-height);
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 0 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        /* Cards */
-        .card {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease;
-            margin-bottom: 20px;
-        }
-        
-        .card:hover {
-            transform: translateY(-3px);
-        }
-        
-        .stat-card {
-            border-top: 4px solid var(--primary-color);
-        }
-        
-        /* Buttons */
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            border-radius: 8px;
-            font-weight: 500;
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-        }
-        
-        /* Badges */
-        .badge {
-            font-size: 11px;
-            padding: 4px 8px;
-        }
-        
-        /* Table */
-        .table {
-            font-size: 14px;
-        }
-        
-        .table th {
-            font-weight: 600;
-            color: #475569;
-            border-bottom: 2px solid var(--primary-color);
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 60px;
-                overflow: hidden;
-            }
-            
-            .sidebar .nav-text,
-            .sidebar-header .logo span {
-                display: none;
-            }
-            
-            .sidebar:hover {
-                width: var(--sidebar-width);
-            }
-            
-            .sidebar:hover .nav-text,
-            .sidebar:hover .logo span {
-                display: inline;
-            }
-            
-            .main-content {
-                margin-left: 60px;
-            }
-            
-            .sidebar:hover ~ .main-content {
-                margin-left: var(--sidebar-width);
-            }
-        }
-        
-        /* Avatar Circle */
-        .avatar-circle {
-            width: 32px;
-            height: 32px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
+        .nav-active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid #00b4d8;
+            color: white !important;
         }
     </style>
-    
     @stack('styles')
 </head>
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <a href="{{ route('staff.dashboard') }}" class="logo d-flex align-items-center">
-                <i class="fas fa-running me-2"></i>
-                <span class="nav-text">MARATHON</span>
-            </a>
-            <small class="text-muted d-block mt-1" style="font-size: 11px;">Staff Panel</small>
+<body class="h-full overflow-x-hidden">
+
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden transition-opacity lg:hidden"></div>
+
+    <aside id="sidebar" class="fixed top-0 left-0 z-50 h-screen w-64 transition-transform -translate-x-full lg:translate-x-0 bg-gradient-to-b from-marathon-blue to-blue-900 text-white shadow-2xl">
+        <div class="flex flex-col h-full">
+            <div class="p-6 flex items-center justify-between">
+                <a href="{{ route('staff.dashboard') }}" class="flex items-center space-x-3 group">
+                    <div class="bg-white p-2 rounded-lg group-hover:rotate-12 transition-transform">
+                        <i class="fas fa-running text-marathon-blue text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tighter">MARATHON<span class="text-marathon-light text-sm block tracking-widest uppercase opacity-80">Staff Panel</span></span>
+                </a>
+                <button id="closeSidebar" class="lg:hidden text-white/70 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+                <p class="px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2">Main Menu</p>
+                
+                <a href="{{ route('staff.dashboard') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all hover:bg-white/10 @if(request()->routeIs('staff.dashboard')) nav-active @endif">
+                    <i class="fas fa-tachometer-alt w-6"></i> Dashboard
+                </a>
+
+                <a href="{{ route('staff.profile.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all hover:bg-white/10 @if(request()->routeIs('staff.profile.*')) nav-active @endif">
+                    <i class="fas fa-user w-6"></i> Profil Staff
+                </a>
+                @php
+                    $pending_registrations = DB::table('pendaftaran')->where('status_pendaftaran', 'menunggu')->count();
+                    $pending_payments = DB::table('pembayaran')->where('status', 'menunggu')->count();
+                @endphp
+
+                <a href="{{ route('staff.registrations.index') }}" class="flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all hover:bg-white/10 @if(request()->routeIs('staff.registrations.*')) nav-active @endif">
+                    <div class="flex items-center"><i class="fas fa-user-check w-6"></i> Verifikasi Peserta</div>
+                    @if($pending_registrations > 0)
+                        <span class="bg-red-500 text-[10px] px-2 py-1 rounded-full text-white">{{ $pending_registrations }}</span>
+                    @endif
+                </a>
+
+                <a href="{{ route('staff.payments.index') }}" class="flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all hover:bg-white/10 @if(request()->routeIs('staff.payments.*')) nav-active @endif">
+                    <div class="flex items-center"><i class="fas fa-money-check-alt w-6"></i> Verifikasi Bayar</div>
+                    @if($pending_payments > 0)
+                        <span class="bg-yellow-400 text-blue-900 text-[10px] font-bold px-2 py-1 rounded-full">{{ $pending_payments }}</span>
+                    @endif
+                </a>
+
+                <a href="{{ route('staff.packages.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all hover:bg-white/10 @if(request()->routeIs('staff.packages.*')) nav-active @endif">
+                    <i class="fas fa-box w-6"></i> Paket Lomba
+                </a>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all hover:bg-white/10">
+    <i class="fas fa-file-export w-6"></i> Export Data
+</a>
+
+                <div class="pt-4 mt-4 border-t border-white/10">
+                    <a href="{{ url('/') }}" target="_blank" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all hover:bg-white/10">
+                        <i class="fas fa-external-link-alt w-6"></i> Lihat Website
+                    </a>
+                    <button onclick="confirmLogout()" class="w-full flex items-center px-4 py-3 text-sm font-medium text-orange-300 rounded-xl transition-all hover:bg-white/10">
+                        <i class="fas fa-sign-out-alt w-6"></i> Logout
+                    </button>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
+                </div>
+            </nav>
         </div>
+    </aside>
+
+    <div class="lg:ml-64 flex flex-col min-h-screen">
         
-        <div class="sidebar-menu">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link @if(request()->routeIs('staff.dashboard')) active @endif" 
-                       href="{{ route('staff.dashboard') }}">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span class="nav-text">Dashboard</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link @if(request()->routeIs('staff.events.*')) active @endif" 
-                       href="{{ route('staff.events.index') }}">
-                        <i class="fas fa-calendar-check"></i>
-                        <span class="nav-text">Kelola Event</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link @if(request()->routeIs('staff.registrations.*')) active @endif" 
-                       href="{{ route('staff.registrations.index') }}">
-                        <i class="fas fa-user-check"></i>
-                        <span class="nav-text">Verifikasi Peserta</span>
-                        @if(($pending_registrations ?? 0) > 0)
-                        <span class="badge bg-danger float-end">{{ $pending_registrations ?? 0 }}</span>
-                        @endif
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link @if(request()->routeIs('staff.payments.*')) active @endif" 
-                       href="{{ route('staff.payments.index') }}">
-                        <i class="fas fa-money-check-alt"></i>
-                        <span class="nav-text">Verifikasi Pembayaran</span>
-                        @if(($pending_payments ?? 0) > 0)
-                        <span class="badge bg-warning float-end">{{ $pending_payments ?? 0 }}</span>
-                        @endif
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link @if(request()->routeIs('staff.packages.*')) active @endif" 
-                       href="{{ route('staff.packages.index') }}">
-                        <i class="fas fa-box"></i>
-                        <span class="nav-text">Paket Lomba</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link @if(request()->routeIs('staff.results.*')) active @endif" 
-                       href="{{ route('staff.results.index') }}">
-                        <i class="fas fa-list-ol"></i>
-                        <span class="nav-text">Hasil Lomba</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('staff.export.registrations') }}">
-                        <i class="fas fa-file-export"></i>
-                        <span class="nav-text">Export Data</span>
-                    </a>
-                </li>
-                
-                <hr class="text-muted mx-2 my-2">
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/') }}" target="_blank">
-                        <i class="fas fa-external-link-alt"></i>
-                        <span class="nav-text">Website</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="#" onclick="confirmLogout()">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span class="nav-text">Logout</span>
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                        @csrf
-                    </form>
-                </li>
-            </ul>
-        </div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-primary btn-sm d-md-none me-2" id="sidebarToggle">
+        <header class="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-slate-200">
+            <div class="flex items-center">
+                <button id="openSidebar" class="p-2 mr-4 text-slate-600 lg:hidden hover:bg-slate-100 rounded-lg">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h5 class="mb-0">@yield('page-title', 'Dashboard Staff')</h5>
+                <h1 class="text-lg font-semibold text-slate-800">@yield('page-title', 'Dashboard')</h1>
             </div>
-            
-            <div class="d-flex align-items-center">
-                <!-- Quick Stats -->
-                <div class="d-none d-md-flex me-3">
-                    <div class="text-end">
-                        <small class="text-muted d-block">Event Aktif</small>
-                        <span class="fw-bold">{{ $active_events ?? 0 }}</span>
+
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-6 mr-4 border-r pr-6 border-slate-200">
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Event Aktif</p>
+                        <p class="text-sm font-bold text-marathon-blue">{{ DB::table('lomba')->where('status', 'mendatang')->count() }}</p>
                     </div>
-                    <div class="vr mx-3"></div>
-                    <div class="text-end">
-                        <small class="text-muted d-block">Pendaftaran Hari Ini</small>
-                        <span class="fw-bold">{{ $today_registrations ?? 0 }}</span>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Hari Ini</p>
+                        <p class="text-sm font-bold text-marathon-blue">{{ DB::table('pendaftaran')->whereDate('created_at', today())->count() }}</p>
                     </div>
                 </div>
-                
-                <!-- Notifications -->
-                <div class="dropdown me-2">
-                    <button class="btn btn-outline-primary btn-sm position-relative" type="button" 
-                            data-bs-toggle="dropdown">
-                        <i class="fas fa-bell"></i>
-                        @if(($notification_count ?? 0) > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 9px;">
-                            {{ $notification_count ?? 0 }}
-                        </span>
+
+                <div class="relative">
+                    @php
+                        $notifications = DB::table('notifikasi')->where('user_id', session('user_id'))->orWhereNull('user_id')->orderBy('created_at', 'desc')->limit(5)->get();
+                        $unread = $notifications->where('dibaca', 0)->count();
+                    @endphp
+                    <button id="notifBtn" class="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+                        <i class="fas fa-bell text-xl"></i>
+                        @if($unread > 0)
+                            <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 border-2 border-white rounded-full text-[8px] text-white flex items-center justify-center">{{ $unread }}</span>
                         @endif
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end p-0" style="width: 280px;">
-                        <div class="dropdown-header bg-light">
-                            <h6 class="mb-0">Notifikasi</h6>
-                            <small class="text-muted">Pembaruan terbaru</small>
+                    <div id="notifDropdown" class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 hidden overflow-hidden transform transition-all">
+                        <div class="p-4 border-b border-slate-50 flex justify-between items-center">
+                            <span class="font-bold text-slate-700">Notifikasi</span>
+                            <a href="#" class="text-xs text-marathon-blue hover:underline">Lihat Semua</a>
                         </div>
-                        <div class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
-                            @php
-                                $notifications = DB::table('notifikasi')
-                                    ->where('user_id', session('user_id'))
-                                    ->orWhereNull('user_id')
-                                    ->orderBy('created_at', 'desc')
-                                    ->limit(5)
-                                    ->get();
-                            @endphp
-                            
-                            @if($notifications->count() > 0)
-                                @foreach($notifications as $notification)
-                                <a href="{{ $notification->tautan ?? '#' }}" 
-                                   class="list-group-item list-group-item-action border-0 {{ $notification->dibaca ? '' : 'bg-light' }}">
-                                    <div class="d-flex">
-                                        <div class="flex-shrink-0">
-                                            @switch($notification->jenis)
-                                                @case('pendaftaran_baru')
-                                                    <i class="fas fa-user-plus text-success"></i>
-                                                    @break
-                                                @case('pembayaran_baru')
-                                                    <i class="fas fa-credit-card text-warning"></i>
-                                                    @break
-                                                @case('pembayaran_terverifikasi')
-                                                    <i class="fas fa-check-circle text-success"></i>
-                                                    @break
-                                                @default
-                                                    <i class="fas fa-info-circle text-primary"></i>
-                                            @endswitch
+                        <div class="max-h-80 overflow-y-auto">
+                            @forelse($notifications as $notif)
+                                <div class="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer">
+                                    <div class="flex space-x-3">
+                                        <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                                            <i class="fas fa-info-circle"></i>
                                         </div>
-                                        <div class="flex-grow-1 ms-2">
-                                            <h6 class="mb-0" style="font-size: 13px;">{{ $notification->judul }}</h6>
-                                            <p class="mb-0 small text-muted">{{ Str::limit($notification->pesan, 40) }}</p>
-                                            <small class="text-muted">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>
+                                        <div>
+                                            <p class="text-xs font-semibold text-slate-800">{{ $notif->judul }}</p>
+                                            <p class="text-[11px] text-slate-500 truncate w-48">{{ $notif->pesan }}</p>
+                                            <p class="text-[10px] text-slate-400 mt-1">{{ \Carbon\Carbon::parse($notif->created_at)->diffForHumans() }}</p>
                                         </div>
                                     </div>
-                                </a>
-                                @endforeach
-                            @else
-                                <div class="list-group-item border-0 text-center py-3">
-                                    <i class="fas fa-bell-slash text-muted mb-2"></i>
-                                    <p class="mb-0 text-muted small">Tidak ada notifikasi</p>
                                 </div>
-                            @endif
-                        </div>
-                        <div class="dropdown-footer text-center py-2 bg-light">
-                            <a href="#" class="text-decoration-none small">Lihat semua</a>
+                            @empty
+                                <div class="p-8 text-center text-slate-400">
+                                    <i class="fas fa-bell-slash block text-2xl mb-2 opacity-20"></i>
+                                    <p class="text-xs">Tidak ada notifikasi</p>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
-                
-                <!-- User Profile -->
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary btn-sm d-flex align-items-center" 
-                            type="button" data-bs-toggle="dropdown">
-                        <div class="me-2">
-                            <div class="avatar-circle">
-                                {{ strtoupper(substr(session('user_nama'), 0, 1)) }}
-                            </div>
-                        </div>
-                        <div class="text-start d-none d-md-block">
-                            <small class="d-block" style="font-size: 12px; line-height: 1.2;">
-                                {{ Str::limit(session('user_nama'), 15) }}
-                            </small>
-                            <small class="text-muted" style="font-size: 10px;">
-                                {{ ucfirst(session('user_peran')) }}
-                            </small>
-                        </div>
-                        <i class="fas fa-chevron-down ms-1"></i>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end">
-                        <a class="dropdown-item" href="#">
-                            <i class="fas fa-user me-2"></i>Profil
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <i class="fas fa-cog me-2"></i>Pengaturan
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="#" onclick="confirmLogout()">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </a>
+
+                <div class="flex items-center space-x-3 pl-4 border-l border-slate-200">
+                    <div class="hidden sm:block text-right">
+                        <p class="text-xs font-bold text-slate-700 leading-none">{{ session('user_nama') }}</p>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-tighter">{{ session('user_peran') }}</p>
+                    </div>
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-marathon-blue to-marathon-light flex items-center justify-center text-white font-bold shadow-lg shadow-blue-200">
+                        {{ strtoupper(substr(session('user_nama'), 0, 1)) }}
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Page Content -->
-        <div class="container-fluid">
-            <!-- Flash Messages -->
+        </header>
+
+        <main class="p-6 flex-1">
             @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="mb-6 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 rounded-r-xl shadow-sm animate-bounce-short">
+                <i class="fas fa-check-circle mr-3"></i>
+                <span class="text-sm font-medium">{{ session('success') }}</span>
             </div>
             @endif
-            
+
             @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="mb-6 flex items-center p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-700 rounded-r-xl shadow-sm">
+                <i class="fas fa-exclamation-circle mr-3"></i>
+                <span class="text-sm font-medium">{{ session('error') }}</span>
             </div>
             @endif
-            
-            @if(session('warning'))
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i> {{ session('warning') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+            <div class="animate-fade-in">
+                @yield('content')
             </div>
-            @endif
-            
-            <!-- Main Content -->
-            @yield('content')
-        </div>
+        </main>
+
+        <footer class="p-6 bg-white border-t border-slate-200 text-center">
+            <p class="text-xs text-slate-400">&copy; 2026 Marathon Events. Developed with <i class="fas fa-heart text-rose-400"></i> for Runners.</p>
+        </footer>
     </div>
-    
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
+
     <script>
-        // Toggle sidebar on mobile
-        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.style.width = sidebar.style.width === '220px' ? '60px' : '220px';
+        // Sidebar Toggle Logic
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const openBtn = document.getElementById('openSidebar');
+        const closeBtn = document.getElementById('closeSidebar');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        openBtn.addEventListener('click', toggleSidebar);
+        closeBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // Notif Dropdown
+        const notifBtn = document.getElementById('notifBtn');
+        const notifDropdown = document.getElementById('notifDropdown');
+
+        notifBtn.addEventListener('click', () => {
+            notifDropdown.classList.toggle('hidden');
         });
-        
-        // Auto dismiss alerts
-        setTimeout(() => {
-            document.querySelectorAll('.alert').forEach(alert => {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
-        
-        // Confirm logout
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', (e) => {
+            if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+                notifDropdown.classList.add('hidden');
+            }
+        });
+
         function confirmLogout() {
-            if (confirm('Yakin ingin logout?')) {
+            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 document.getElementById('logout-form').submit();
             }
         }
-        
-        // Mark notifications as read
-        document.querySelectorAll('.list-group-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (!this.href || this.href === '#') {
-                    e.preventDefault();
-                }
-                this.classList.remove('bg-light');
-            });
-        });
+
+        // Auto hide alerts after 5s
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.animate-bounce-short');
+            alerts.forEach(el => el.style.display = 'none');
+        }, 5000);
     </script>
-    
     @stack('scripts')
 </body>
 </html>

@@ -4,414 +4,184 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Detail Pendaftaran - Admin Panel</title>
+    <title>Detail Peserta - {{ $registration->kode_pendaftaran ?? 'N/A' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        .premium-card {
+            background: white;
+            border-radius: 2rem;
+            border: 1px solid rgba(59, 130, 246, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.05);
+        }
+        .status-badge { 
+            padding: 8px 20px; 
+            border-radius: 99px; 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .status-menunggu { background: #fffbeb; color: #b45309; border: 1px solid #fef3c7; }
+        .status-disetujui, .status-lunas { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+        .status-ditolak, .status-gagal { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .premium-card { border: 1px solid #eee; box-shadow: none; }
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen">
-        <!-- Header -->
-        <div class="bg-white shadow-sm border-b border-gray-200">
-            <div class="px-6 py-4">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <a href="{{ route('admin.registrations.index') }}" class="text-blue-600 hover:text-blue-800 mb-2 inline-block">
-                            <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar
-                        </a>
-                        <h1 class="text-2xl font-bold text-gray-800">Detail Pendaftaran</h1>
-                        <p class="text-gray-600">Kode: {{ $registration->kode_pendaftaran ?? 'N/A' }}</p>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        @if($registration->status == 'menunggu')
-                        <button onclick="approveRegistration()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center">
-                            <i class="fas fa-check mr-2"></i> Setujui
-                        </button>
-                        <button onclick="rejectRegistration()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center">
-                            <i class="fas fa-times mr-2"></i> Tolak
-                        </button>
-                        @endif
-                    </div>
+<body class="antialiased">
+
+    <header class="glass-header sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.registrations.index') }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-xl font-black text-slate-800 tracking-tight">Detail Pendaftaran</h1>
+                    <p class="text-xs font-bold text-blue-500 uppercase tracking-widest">{{ $registration->kode_pendaftaran }}</p>
                 </div>
             </div>
+            <div class="flex gap-3">
+                <button onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all flex items-center">
+                    <i class="fas fa-print mr-2"></i> Cetak Dokumen
+                </button>
+            </div>
         </div>
-        
-        <div class="px-6 py-6 max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Left Column -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Participant Info -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-lg font-semibold text-gray-800">Informasi Peserta</h2>
-                            @php
-                                $statusClass = '';
-                                $statusText = '';
-                                switch($registration->status) {
-                                    case 'menunggu':
-                                        $statusClass = 'bg-yellow-100 text-yellow-800';
-                                        $statusText = 'Menunggu';
-                                        break;
-                                    case 'disetujui':
-                                        $statusClass = 'bg-green-100 text-green-800';
-                                        $statusText = 'Disetujui';
-                                        break;
-                                    case 'ditolak':
-                                        $statusClass = 'bg-red-100 text-red-800';
-                                        $statusText = 'Ditolak';
-                                        break;
-                                }
-                            @endphp
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $statusClass }}">
-                                {{ $statusText }}
-                            </span>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-500 mb-2">Data Pribadi</h3>
-                                <div class="space-y-3">
-                                    <div>
-                                        <p class="text-xs text-gray-500">Nama Lengkap</p>
-                                        <p class="font-medium">{{ $registration->nama_lengkap ?? $registration->user_nama ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Email</p>
-                                        <p class="font-medium">{{ $registration->email ?? $registration->user_email ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Telepon</p>
-                                        <p class="font-medium">{{ $registration->telepon ?? $registration->user_phone ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Tanggal Lahir</p>
-                                        <p class="font-medium">{{ $registration->tanggal_lahir ? date('d M Y', strtotime($registration->tanggal_lahir)) : ($registration->user_birthdate ? date('d M Y', strtotime($registration->user_birthdate)) : 'N/A') }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Jenis Kelamin</p>
-                                        <p class="font-medium">
-                                            @if($registration->jenis_kelamin == 'L')
-                                                Laki-laki
-                                            @elseif($registration->jenis_kelamin == 'P')
-                                                Perempuan
-                                            @else
-                                                N/A
-                                            @endif
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-500 mb-2">Alamat & Lainnya</h3>
-                                <div class="space-y-3">
-                                    <div>
-                                        <p class="text-xs text-gray-500">Alamat</p>
-                                        <p class="font-medium">{{ $registration->alamat ?? $registration->user_alamat ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Ukuran Jersey</p>
-                                        <p class="font-medium">{{ $registration->ukuran_jersey ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Nomor Start</p>
-                                        <p class="font-medium">{{ $registration->nomor_start ?? 'Belum ditetapkan' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Catatan Khusus</p>
-                                        <p class="font-medium">{{ $registration->catatan_khusus ?? 'Tidak ada' }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Event Info -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-6">Informasi Event</h2>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-500 mb-2">Detail Event</h3>
-                                <div class="space-y-3">
-                                    <div>
-                                        <p class="text-xs text-gray-500">Nama Event</p>
-                                        <p class="font-medium">{{ $registration->nama ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Kategori</p>
-                                        <p class="font-medium">{{ $registration->kategori ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Paket Dipilih</p>
-                                        <p class="font-medium">{{ $registration->package_name ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Harga Paket</p>
-                                        <p class="font-medium">Rp {{ number_format($registration->package_price ?? 0, 0, ',', '.') }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-500 mb-2">Tanggal & Waktu</h3>
-                                <div class="space-y-3">
-                                    <div>
-                                        <p class="text-xs text-gray-500">Tanggal Event</p>
-                                        <p class="font-medium">{{ $registration->tanggal ? date('d M Y', strtotime($registration->tanggal)) : 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Lokasi</p>
-                                        <p class="font-medium">{{ $registration->lokasi ?? 'N/A' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Tanggal Pendaftaran</p>
-                                        <p class="font-medium">{{ date('d M Y H:i', strtotime($registration->created_at)) }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Terakhir Diperbarui</p>
-                                        <p class="font-medium">{{ date('d M Y H:i', strtotime($registration->updated_at)) }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 space-y-8">
                 
-                <!-- Right Column -->
-                <div class="space-y-6">
-                    <!-- Actions Card -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-6">Aksi</h2>
-                        
-                        <div class="space-y-3">
-                            @if($registration->status == 'menunggu')
-                            <button onclick="approveRegistration()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center transition">
-                                <i class="fas fa-check mr-2"></i> Setujui Pendaftaran
-                            </button>
-                            
-                            <button onclick="rejectRegistration()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-medium flex items-center justify-center transition">
-                                <i class="fas fa-times mr-2"></i> Tolak Pendaftaran
-                            </button>
-                            @endif
-                            
-                            <button onclick="window.print()" class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 py-3 rounded-lg font-medium flex items-center justify-center transition">
-                                <i class="fas fa-print mr-2"></i> Cetak Detail
-                            </button>
-                            
-                            @if($payment)
-                            <a href="{{ route('admin.payments.view', $payment->id) }}" class="block w-full border border-blue-300 hover:bg-blue-50 text-blue-600 py-3 rounded-lg font-medium flex items-center justify-center transition">
-                                <i class="fas fa-credit-card mr-2"></i> Lihat Pembayaran
-                            </a>
-                            @endif
+                <section class="premium-card p-8">
+                    <div class="flex justify-between items-start mb-8">
+                        <div class="flex items-center gap-5">
+                            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-200">
+                                {{ strtoupper(substr($registration->nama_lengkap ?? 'N', 0, 1)) }}
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-800">{{ $registration->nama_lengkap ?? 'N/A' }}</h2>
+                                <p class="text-slate-400 font-medium italic">{{ $registration->email ?? 'N/A' }}</p>
+                            </div>
                         </div>
+                        <span class="status-badge status-{{ $registration->status_pendaftaran }}">
+                            {{ $registration->status_pendaftaran }}
+                        </span>
                     </div>
-                    
-                    <!-- Package Details -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Detail Paket</h2>
-                        
-                        <div class="space-y-3">
-                            <div class="flex items-center">
-                                <span class="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                                <span class="text-gray-700">Paket: {{ $registration->package_name }}</span>
-                            </div>
-                            
-                            @if($registration->termasuk_race_kit)
-                            <div class="flex items-center">
-                                <i class="fas fa-check text-green-500 mr-3"></i>
-                                <span class="text-gray-700">Termasuk Race Kit</span>
-                            </div>
-                            @endif
-                            
-                            @if($registration->termasuk_medali)
-                            <div class="flex items-center">
-                                <i class="fas fa-check text-green-500 mr-3"></i>
-                                <span class="text-gray-700">Termasuk Medali</span>
-                            </div>
-                            @endif
-                            
-                            @if($registration->termasuk_kaos)
-                            <div class="flex items-center">
-                                <i class="fas fa-check text-green-500 mr-3"></i>
-                                <span class="text-gray-700">Termasuk Kaos</span>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                    
-                    <!-- Payment Status -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Status Pembayaran</h2>
-                        
-                        @php
-                            $paymentStatusClass = '';
-                            $paymentStatusText = '';
-                            switch($registration->status_pembayaran) {
-                                case 'lunas':
-                                    $paymentStatusClass = 'bg-green-100 text-green-800';
-                                    $paymentStatusText = 'Lunas';
-                                    break;
-                                case 'menunggu':
-                                    $paymentStatusClass = 'bg-yellow-100 text-yellow-800';
-                                    $paymentStatusText = 'Menunggu';
-                                    break;
-                                case 'gagal':
-                                    $paymentStatusClass = 'bg-red-100 text-red-800';
-                                    $paymentStatusText = 'Gagal';
-                                    break;
-                                default:
-                                    $paymentStatusClass = 'bg-gray-100 text-gray-800';
-                                    $paymentStatusText = 'Belum Dibayar';
-                            }
-                        @endphp
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $paymentStatusClass }}">
-                                {{ $paymentStatusText }}
-                            </span>
-                        </div>
-                        
-                        @if($payment && $payment->bukti_pembayaran)
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12 border-t border-slate-50 pt-8">
                         <div>
-                            <p class="text-sm font-medium text-gray-700 mb-2">Bukti Pembayaran</p>
-                            <a href="{{ asset('storage/' . $payment->bukti_pembayaran) }}" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-file-invoice mr-2"></i> Lihat Bukti Pembayaran
-                            </a>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Nomor Telepon</p>
+                            <p class="font-bold text-slate-700">{{ $registration->telepon ?? 'N/A' }}</p>
                         </div>
-                        @else
-                        <p class="text-gray-500 text-sm">Belum ada bukti pembayaran diunggah.</p>
-                        @endif
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Ukuran Jersey</p>
+                            <p class="font-bold text-blue-600 bg-blue-50 inline-block px-3 py-1 rounded-lg">{{ $registration->ukuran_jersey ?? '-' }}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Alamat Lengkap</p>
+                            <p class="font-bold text-slate-700 leading-relaxed">{{ $registration->alamat ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="premium-card p-8">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight">Detail Kompetisi</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Nama Event</p>
+                                <p class="font-extrabold text-slate-800 text-lg">{{ $registration->nama ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kategori Lomba</p>
+                                <p class="font-bold text-slate-700">{{ $registration->kategori ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tanggal & Waktu</p>
+                                <p class="font-bold text-slate-700">
+                                    <i class="far fa-calendar-alt text-blue-500 mr-2"></i>
+                                    {{ isset($registration->tanggal) ? date('d F Y', strtotime($registration->tanggal)) : 'N/A' }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Lokasi Pelaksanaan</p>
+                                <p class="font-bold text-slate-700">
+                                    <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>
+                                    {{ $registration->lokasi ?? 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="space-y-8">
+                
+                <div class="premium-card p-8 border-l-4 border-blue-600">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Status Transaksi</p>
+                    <div class="flex items-center justify-between mb-6">
+                        <span class="status-badge status-{{ $registration->status_pembayaran ?? 'menunggu' }}">
+                            {{ $registration->status_pembayaran ?? 'Menunggu' }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Biaya Pendaftaran</p>
+                        <p class="text-3xl font-black text-blue-600">Rp {{ number_format($registration->package_price ?? 0, 0, ',', '.') }}</p>
+                        <p class="text-[10px] font-bold text-slate-400 mt-2 italic">* Paket: {{ $registration->package_name ?? 'N/A' }}</p>
                     </div>
                 </div>
+
+                <div class="premium-card p-8">
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Lampiran Bukti</h3>
+                    @if(isset($payment) && $payment->bukti_pembayaran)
+                        <a href="{{ asset('storage/' . $payment->bukti_pembayaran) }}" target="_blank" class="group block relative rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                            <img src="{{ asset('storage/' . $payment->bukti_pembayaran) }}" class="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-blue-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="text-white font-bold text-xs"><i class="fas fa-search-plus mr-2"></i> Perbesar Gambar</span>
+                            </div>
+                        </a>
+                    @else
+                        <div class="p-6 border-2 border-dashed border-slate-100 rounded-2xl text-center">
+                            <i class="fas fa-image text-slate-200 text-3xl mb-3"></i>
+                            <p class="text-xs font-bold text-slate-400 uppercase">Belum ada lampiran</p>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="p-6 text-center">
+                    <p class="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em]">Didaftarkan Pada</p>
+                    <p class="text-xs font-bold text-slate-400 mt-1">{{ date('d/m/Y H:i', strtotime($registration->created_at)) }}</p>
+                </div>
+
             </div>
         </div>
-    </div>
-    
-    <!-- Modal for Rejection Reason -->
-    <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Alasan Penolakan</h3>
-                    <button onclick="closeRejectModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="mb-6">
-                    <label for="rejectReason" class="block text-sm font-medium text-gray-700 mb-2">Masukkan alasan penolakan (opsional)</label>
-                    <textarea id="rejectReason" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Alasan penolakan..."></textarea>
-                </div>
-                
-                <div class="flex justify-end space-x-3">
-                    <button onclick="closeRejectModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">Batal</button>
-                    <button onclick="submitRejection()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium">
-                        <i class="fas fa-times mr-2"></i> Tolak Pendaftaran
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        function approveRegistration() {
-            if (confirm('Apakah Anda yakin ingin menyetujui pendaftaran ini?')) {
-                const button = event.target;
-                const originalText = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
-                button.disabled = true;
-                
-                fetch('{{ route("admin.registrations.approve", $registration->id) }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        alert(data.message);
-                        button.innerHTML = originalText;
-                        button.disabled = false;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat menyetujui pendaftaran');
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                });
-            }
-        }
-        
-        let isRejecting = false;
-        
-        function rejectRegistration() {
-            document.getElementById('rejectModal').classList.remove('hidden');
-            document.getElementById('rejectModal').classList.add('flex');
-        }
-        
-        function closeRejectModal() {
-            document.getElementById('rejectModal').classList.add('hidden');
-            document.getElementById('rejectModal').classList.remove('flex');
-            document.getElementById('rejectReason').value = '';
-        }
-        
-        function submitRejection() {
-            if (isRejecting) return;
-            
-            const reason = document.getElementById('rejectReason').value;
-            isRejecting = true;
-            
-            const button = document.querySelector('#rejectModal button[onclick="submitRejection()"]');
-            const originalText = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
-            button.disabled = true;
-            
-            fetch('{{ route("admin.registrations.reject", $registration->id) }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ reason: reason })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    closeRejectModal();
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                } else {
-                    alert(data.message);
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                    isRejecting = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat menolak pendaftaran');
-                button.innerHTML = originalText;
-                button.disabled = false;
-                isRejecting = false;
-            });
-        }
-        
-        // Close modal on ESC
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeRejectModal();
-            }
-        });
-    </script>
+    </main>
+
 </body>
 </html>

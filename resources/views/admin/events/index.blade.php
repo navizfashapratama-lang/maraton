@@ -293,64 +293,75 @@
 </header>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-aos="fade-up">
-                @php
-                    $stats = [
-                        [
-                            'title' => 'Event Mendatang',
-                            'count' => DB::table('lomba')->where('status', 'mendatang')->count(),
-                            'icon' => 'clock',
-                            'color' => 'green',
-                            'gradient' => 'from-green-500 to-green-600'
-                        ],
-                        [
-                            'title' => 'Event Selesai',
-                            'count' => DB::table('lomba')->where('status', 'selesai')->count(),
-                            'icon' => 'check-circle',
-                            'color' => 'gray',
-                            'gradient' => 'from-gray-500 to-gray-600'
-                        ],
-                        [
-                            'title' => 'Event Dibatalkan',
-                            'count' => DB::table('lomba')->where('status', 'dibatalkan')->count(),
-                            'icon' => 'times-circle',
-                            'color' => 'red',
-                            'gradient' => 'from-red-500 to-red-600'
-                        ],
-                        [
-                            'title' => 'Total Pendaftar',
-                            'count' => DB::table('pendaftaran')->count(),
-                            'icon' => 'users',
-                            'color' => 'blue',
-                            'gradient' => 'from-blue-500 to-blue-600'
-                        ]
-                    ];
-                @endphp
-                
-                @foreach($stats as $index => $stat)
-                <div class="event-card bg-white shadow-lg animate-fade-up" 
-                     data-aos="fade-up" 
-                     data-aos-delay="{{ $index * 100 }}">
-                    <div class="p-5">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <div class="text-2xl font-bold text-gray-800 mb-1">{{ $stat['count'] }}</div>
-                                <div class="text-sm text-gray-600">{{ $stat['title'] }}</div>
-                            </div>
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-r {{ $stat['gradient'] }} flex items-center justify-center text-white text-lg shadow">
-                                <i class="fas fa-{{ $stat['icon'] }}"></i>
-                            </div>
-                        </div>
-                        <div class="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r {{ $stat['gradient'] }} rounded-full"
-                                 style="width: {{ $events->total() > 0 ? ($stat['count'] / $events->total() * 100) : 0 }}%">
-                            </div>
-                        </div>
+         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-aos="fade-up">
+    @php
+        // 1. Ambil hitungan riil dari database (Tabel sesuai maraton_db.sql)
+        $countMendatang = DB::table('lomba')->where('status', 'mendatang')->count();
+        $countSelesai = DB::table('lomba')->where('status', 'selesai')->count();
+        $countBatal = DB::table('lomba')->where('status', 'dibatalkan')->count();
+        $countPendaftar = DB::table('pendaftaran')->count();
+
+        // 2. Hitung total semua lomba sebagai dasar persentase (agar bar tidak melebihi 100%)
+        $totalLombaRiil = DB::table('lomba')->count();
+
+        $stats = [
+            [
+                'title' => 'Event Mendatang',
+                'count' => $countMendatang,
+                'icon' => 'clock',
+                'gradient' => 'from-green-500 to-green-600',
+                'percent' => $totalLombaRiil > 0 ? ($countMendatang / $totalLombaRiil * 100) : 0
+            ],
+            [
+                'title' => 'Event Selesai',
+                'count' => $countSelesai,
+                'icon' => 'check-circle',
+                'gradient' => 'from-gray-500 to-gray-600',
+                'percent' => $totalLombaRiil > 0 ? ($countSelesai / $totalLombaRiil * 100) : 0
+            ],
+            [
+                'title' => 'Event Dibatalkan',
+                'count' => $countBatal,
+                'icon' => 'times-circle',
+                'gradient' => 'from-red-500 to-red-600',
+                'percent' => $totalLombaRiil > 0 ? ($countBatal / $totalLombaRiil * 100) : 0
+            ],
+            [
+                'title' => 'Total Pendaftar',
+                'count' => $countPendaftar,
+                'icon' => 'users',
+                'gradient' => 'from-blue-500 to-blue-600',
+                'percent' => 100 // Untuk pendaftar kita set bar penuh jika ada data
+            ]
+        ];
+    @endphp
+    
+    @foreach($stats as $index => $stat)
+    <div class="event-card bg-white shadow-lg animate-fade-up" 
+         data-aos="fade-up" 
+         data-aos-delay="{{ $index * 100 }}">
+        <div class="p-5">
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="text-2xl font-bold text-gray-800 mb-1">
+                        {{ number_format($stat['count'], 0, ',', '.') }}
                     </div>
+                    <div class="text-sm text-gray-600">{{ $stat['title'] }}</div>
                 </div>
-                @endforeach
+                <div class="w-12 h-12 rounded-full bg-gradient-to-r {{ $stat['gradient'] }} flex items-center justify-center text-white text-lg shadow">
+                    <i class="fas fa-{{ $stat['icon'] }}"></i>
+                </div>
             </div>
+            
+            <div class="mt-4 h-1 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r {{ $stat['gradient'] }} rounded-full transition-all duration-500"
+                     style="width: {{ $stat['count'] > 0 ? $stat['percent'] : 0 }}%">
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
 
             <!-- Event Table -->
             <div class="bg-white rounded-2xl shadow-xl overflow-hidden" data-aos="fade-up">
@@ -623,53 +634,22 @@
                     </table>
                 </div>
                 
-                <!-- Pagination -->
-                @if($events->hasPages())
-                <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
-                    <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <div class="text-sm text-gray-700">
-                            Menampilkan <span class="font-semibold">{{ $events->firstItem() }}</span> - 
-                            <span class="font-semibold">{{ $events->lastItem() }}</span> dari 
-                            <span class="font-semibold">{{ $events->total() }}</span> event
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            @php
-                                // Custom pagination untuk Tailwind
-                                $paginator = $events;
-                                $elements = $paginator->elements();
-                            @endphp
-                            
-                            @if(is_array($elements))
-                                <nav class="flex items-center space-x-2">
-                                    @foreach ($elements as $element)
-                                        {{-- "Three Dots" Separator --}}
-                                        @if (is_string($element))
-                                            <span class="px-3 py-1 text-gray-500">...</span>
-                                        @endif
-                                        
-                                        {{-- Array Of Links --}}
-                                        @if (is_array($element))
-                                            @foreach ($element as $page => $url)
-                                                @if ($page == $paginator->currentPage())
-                                                    <span class="px-3 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium">
-                                                        {{ $page }}
-                                                    </span>
-                                                @else
-                                                    <a href="{{ $url }}" 
-                                                       class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition duration-200">
-                                                        {{ $page }}
-                                                    </a>
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    @endforeach
-                                </nav>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                @endif
-            </div>
+              <!-- Pagination -->
+@if($events->hasPages())
+<div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
+    <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div class="text-sm text-gray-700">
+            Menampilkan <span class="font-semibold">{{ $events->firstItem() }}</span> - 
+            <span class="font-semibold">{{ $events->lastItem() }}</span> dari 
+            <span class="font-semibold">{{ $events->total() }}</span> event
+        </div>
+        <div class="flex items-center space-x-2">
+            {{-- PERBAIKAN: Gunakan links() bawaan Laravel --}}
+            {{ $events->links() }}
+        </div>
+    </div>
+</div>
+@endif
 
             <!-- Quick Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">

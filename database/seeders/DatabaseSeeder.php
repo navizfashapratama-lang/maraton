@@ -2,24 +2,38 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Nonaktifkan foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        
+        // Hapus data lama untuk menghindari duplikasi
+        DB::table('pengguna')->truncate();
+        DB::table('kategori_event')->truncate();
+        DB::table('lomba')->truncate();
+        DB::table('paket')->truncate();
+        DB::table('pendaftaran')->truncate();
+        DB::table('pembayaran')->truncate();
+        DB::table('log_aktivitas')->truncate();
+        DB::table('notifikasi')->truncate();
+        
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Seed data berurutan
+        $this->call([
+            KategoriEventSeeder::class,
+            PenggunaSeeder::class,
+            LombaSeeder::class,
         ]);
     }
 }

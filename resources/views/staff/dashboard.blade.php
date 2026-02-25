@@ -4,609 +4,243 @@
 @section('page-title', 'Dashboard Staff')
 
 @section('content')
-<div class="container-fluid px-0">
-    <!-- Stats Overview Cards -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="stats-grid">
-                <!-- Total Events -->
-                <div class="stat-card card-hover">
-                    <div class="stat-icon-wrapper bg-primary-light">
-                        <i class="fas fa-calendar-alt text-primary"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h6 class="stat-label">Total Event</h6>
-                        <h3 class="stat-value">{{ $total_events }}</h3>
-                        <div class="stat-action">
-                            <a href="{{ route('staff.events.index') }}" class="stat-link">
-                                Lihat semua <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
+<div class="space-y-6 animate-fade-in">
+    
+    <div class="relative overflow-hidden bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-10 shadow-sm">
+        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-blue-50 rounded-full opacity-50"></div>
+        
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="flex items-center space-x-6">
+                <div class="hidden sm:block">
+                    @if(Auth::user()->foto_profil ?? '' )
+                        <div class="relative group">
+                            <img src="{{ Storage::url(Auth::user()->foto_profil) }}" 
+                                 class="h-24 w-24 rounded-3xl object-cover shadow-2xl shadow-blue-100 border-4 border-white transform transition-transform group-hover:scale-105 duration-300">
+                            <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-white rounded-full shadow-sm"></div>
                         </div>
+                    @else
+                        <div class="h-24 w-24 flex items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-blue-800 shadow-xl shadow-blue-200 text-white border-4 border-white transform transition-transform hover:rotate-3 duration-300">
+                            <span class="text-3xl font-black">{{ strtoupper(substr(session('user_nama'), 0, 1)) }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                <div>
+                    @php $userName = session('user_nama') ?? 'Staff'; @endphp
+                    <h2 class="text-3xl font-black text-slate-800 tracking-tight">Selamat Datang, {{ $userName }}!</h2>
+                    <div class="flex items-center mt-1 text-slate-500 font-bold text-sm uppercase tracking-wider">
+                        <i class="far fa-calendar-check mr-2 text-blue-500 text-base"></i>
+                        {{ now()->translatedFormat('l, d F Y') }}
+                    </div>
+                    
+                    <div class="mt-5 flex items-center p-2 px-4 bg-orange-50 text-orange-700 rounded-2xl text-xs inline-flex border border-orange-100 font-black tracking-tight uppercase">
+                        <span class="relative flex h-2 w-2 mr-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                        </span>
+                        Ada <span class="mx-1 text-orange-900 underline">{{ $pending_registrations }}</span> pendaftaran menunggu verifikasi
                     </div>
                 </div>
-                
-                <!-- Total Participants -->
-                <div class="stat-card card-hover">
-                    <div class="stat-icon-wrapper bg-success-light">
-                        <i class="fas fa-users text-success"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h6 class="stat-label">Total Peserta</h6>
-                        <h3 class="stat-value">{{ $total_registrations }}</h3>
-                        <div class="stat-action">
-                            <a href="{{ route('staff.registrations.index') }}" class="stat-link">
-                                Lihat semua <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 lg:w-1/3">
+                <div class="bg-slate-50 border border-slate-100 p-5 rounded-[1.5rem] text-center transition-all hover:bg-white hover:shadow-md group">
+                    <p class="text-2xl font-black text-slate-800 group-hover:text-blue-600 transition-colors">{{ $today_registrations ?? 0 }}</p>
+                    <p class="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 mt-1">Hari Ini</p>
                 </div>
-                
-                <!-- Pending Verifications -->
-                <div class="stat-card card-hover">
-                    <div class="stat-icon-wrapper bg-warning-light">
-                        <i class="fas fa-clock text-warning"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h6 class="stat-label">Menunggu Verifikasi</h6>
-                        <h3 class="stat-value">{{ $pending_registrations }}</h3>
-                        <div class="stat-action">
-                            <a href="{{ route('staff.registrations.index') }}?status=menunggu" class="stat-link">
-                                Verifikasi sekarang <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Revenue -->
-                <div class="stat-card card-hover">
-                    <div class="stat-icon-wrapper bg-info-light">
-                        <i class="fas fa-money-bill-wave text-info"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h6 class="stat-label">Total Pendapatan</h6>
-                        <h3 class="stat-value">Rp {{ number_format($total_revenue, 0, ',', '.') }}</h3>
-                        <div class="stat-meta">
-                            <span class="badge bg-success">Terverifikasi</span>
-                        </div>
-                    </div>
+                <div class="bg-slate-50 border border-slate-100 p-5 rounded-[1.5rem] text-center transition-all hover:bg-white hover:shadow-md group">
+                    <p class="text-2xl font-black text-slate-800 group-hover:text-blue-600 transition-colors">{{ $active_events ?? 0 }}</p>
+                    <p class="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 mt-1">Event Aktif</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Area -->
-    <div class="row">
-        <!-- Left Column: Upcoming Events -->
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="mb-0">Event Mendatang</h5>
-                            <p class="text-muted mb-0 small">Event yang akan segera dilaksanakan</p>
-                        </div>
-                        <a href="{{ route('staff.events.index') }}" class="btn btn-sm btn-outline-primary">
-                            Lihat Semua <i class="fas fa-external-link-alt ms-1"></i>
-                        </a>
-                    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div class="group bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-blue-500 transition-all duration-300">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Event</p>
+                    <h3 class="text-3xl font-black text-slate-800 mt-1">{{ $total_events }}</h3>
                 </div>
-                <div class="card-body p-0">
-                    @if($upcoming_events->count() > 0)
-                        <div class="event-list">
-                            @foreach($upcoming_events as $event)
-                            <div class="event-item">
-                                <div class="event-date">
-                                    <div class="event-day">{{ \Carbon\Carbon::parse($event->tanggal)->format('d') }}</div>
-                                    <div class="event-month">{{ \Carbon\Carbon::parse($event->tanggal)->format('M') }}</div>
-                                </div>
-                                <div class="event-details">
-                                    <h6 class="event-title mb-1">{{ $event->nama }}</h6>
-                                    <p class="event-description mb-2 text-muted small">
-                                        {{ Str::limit($event->deskripsi, 60) }}
-                                    </p>
-                                    <div class="event-meta">
-                                        <span class="badge bg-light text-dark me-2">
-                                            <i class="fas fa-map-marker-alt me-1"></i> {{ Str::limit($event->lokasi, 25) }}
-                                        </span>
-                                        <span class="badge bg-primary">{{ $event->kategori }}</span>
-                                    </div>
-                                </div>
-                                <div class="event-actions">
-                                    <div class="btn-group">
-                                        <a href="{{ route('staff.events.edit', $event->id) }}" 
-                                           class="btn btn-sm btn-icon" title="Edit Event">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ route('staff.registrations.index') }}?event_id={{ $event->id }}" 
-                                           class="btn btn-sm btn-icon" title="Lihat Peserta">
-                                            <i class="fas fa-users"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <div class="empty-state">
-                                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">Tidak ada event mendatang</h5>
-                                <p class="text-muted mb-4">Belum ada event yang akan datang</p>
-                                <a href="{{ route('staff.events.create') }}" class="btn btn-primary">
-                                    <i class="fas fa-plus me-1"></i> Buat Event Baru
-                                </a>
-                            </div>
-                        </div>
-                    @endif
+                <div class="p-4 bg-blue-50 text-blue-600 rounded-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                    <i class="fas fa-calendar-alt text-xl"></i>
                 </div>
+            </div>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-blue-600 h-full transition-all duration-1000" style="width: {{ $total_events > 0 ? ($active_events/$total_events)*100 : 0 }}%"></div>
             </div>
         </div>
 
-        <!-- Right Column: Recent Registrations & Quick Actions -->
-        <div class="col-lg-4 mb-4">
-            <!-- Recent Registrations -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white border-0 py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="mb-0">Pendaftaran Terbaru</h5>
-                            <p class="text-muted mb-0 small">Pendaftaran yang baru masuk</p>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">{{ $recent_registrations->count() }}</span>
-                    </div>
+        <div class="group bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-emerald-500 transition-all duration-300">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Peserta</p>
+                    <h3 class="text-3xl font-black text-slate-800 mt-1">{{ $total_registrations }}</h3>
                 </div>
-                <div class="card-body p-0">
-                    @if($recent_registrations->count() > 0)
-                        <div class="registration-list">
-                            @foreach($recent_registrations as $registration)
-                            <div class="registration-item">
-                                <div class="user-avatar">
-                                    {{ strtoupper(substr($registration->nama_lengkap, 0, 1)) }}
-                                </div>
-                                <div class="registration-details">
-                                    <h6 class="user-name mb-0">{{ $registration->nama_lengkap }}</h6>
-                                    <small class="text-muted d-block">{{ $registration->kode_pendaftaran }}</small>
-                                    <small class="text-muted">
-                                        <i class="far fa-clock me-1"></i>
-                                        {{ \Carbon\Carbon::parse($registration->created_at)->diffForHumans() }}
-                                    </small>
-                                </div>
-                                <div class="registration-status">
-                                    @if($registration->status_pendaftaran == 'disetujui')
-                                        <span class="status-badge status-approved">
-                                            <i class="fas fa-check-circle me-1"></i> Disetujui
-                                        </span>
-                                    @elseif($registration->status_pendaftaran == 'menunggu')
-                                        <span class="status-badge status-pending">
-                                            <i class="fas fa-clock me-1"></i> Menunggu
-                                        </span>
-                                    @else
-                                        <span class="status-badge status-rejected">
-                                            <i class="fas fa-times-circle me-1"></i> Ditolak
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-4">
-                            <i class="fas fa-user-slash fa-2x text-muted mb-3"></i>
-                            <p class="text-muted">Belum ada pendaftaran</p>
-                        </div>
-                    @endif
+                <div class="p-4 bg-emerald-50 text-emerald-600 rounded-2xl group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+                    <i class="fas fa-users text-xl"></i>
                 </div>
             </div>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full" style="width: 70%"></div>
+            </div>
+        </div>
 
-            <!-- Quick Actions -->
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0">Aksi Cepat</h5>
-                    <p class="text-muted mb-0 small">Akses fitur penting dengan cepat</p>
+        <div class="group bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-orange-500 transition-all duration-300">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Menunggu</p>
+                    <h3 class="text-3xl font-black text-slate-800 mt-1">{{ $pending_registrations }}</h3>
                 </div>
-                <div class="card-body">
-                    <div class="quick-actions-grid">
-                        <a href="{{ route('staff.events.create') }}" class="quick-action card-hover">
-                            <div class="action-icon bg-primary">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                            <div class="action-content">
-                                <h6 class="mb-0">Tambah Event</h6>
-                                <small class="text-muted">Buat event baru</small>
-                            </div>
-                        </a>
-
-                        <a href="{{ route('staff.packages.create') }}" class="quick-action card-hover">
-                            <div class="action-icon bg-success">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            <div class="action-content">
-                                <h6 class="mb-0">Tambah Paket</h6>
-                                <small class="text-muted">Buat paket lomba</small>
-                            </div>
-                        </a>
-
-                        <a href="{{ route('staff.payments.index') }}?status=menunggu" class="quick-action card-hover">
-                            <div class="action-icon bg-warning">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="action-content">
-                                <h6 class="mb-0">Verifikasi Pembayaran</h6>
-                                <small class="text-muted">{{ $pending_payments }} menunggu</small>
-                            </div>
-                        </a>
-
-                        <a href="{{ route('staff.results.create') }}" class="quick-action card-hover">
-                            <div class="action-icon bg-info">
-                                <i class="fas fa-trophy"></i>
-                            </div>
-                            <div class="action-content">
-                                <h6 class="mb-0">Input Hasil</h6>
-                                <small class="text-muted">Input hasil lomba</small>
-                            </div>
-                        </a>
-                    </div>
+                <div class="p-4 bg-orange-50 text-orange-600 rounded-2xl group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                    <i class="fas fa-clock text-xl"></i>
                 </div>
+            </div>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-orange-500 h-full" style="width: 45%"></div>
+            </div>
+        </div>
+
+        <div class="group bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hover:border-indigo-600 transition-all duration-300">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pendapatan</p>
+                    <h3 class="text-lg font-black text-slate-800 mt-1 tracking-tight">Rp {{ number_format($total_revenue, 0, ',', '.') }}</h3>
+                </div>
+                <div class="p-4 bg-indigo-50 text-indigo-600 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
+                    <i class="fas fa-wallet text-xl"></i>
+                </div>
+            </div>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-indigo-600 h-full" style="width: 90%"></div>
             </div>
         </div>
     </div>
-</div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2 bg-white border border-slate-200 rounded-[2rem] shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h4 class="text-lg font-black text-slate-800 uppercase tracking-tight">Event Mendatang</h4>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Jadwal pelaksanaan marathon terbaru</p>
+                </div>
+                <a href="{{ route('staff.events.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black py-2.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-100 uppercase tracking-widest">
+                    <i class="fas fa-plus mr-1"></i> Baru
+                </a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50/80">
+                        <tr>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Event & Kategori</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Waktu</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-medium">
+                        @foreach($upcoming_events as $event)
+                        <tr class="hover:bg-slate-50 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mr-4 group-hover:rotate-6 transition-transform">
+                                        <i class="fas fa-running text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-black text-slate-800 leading-none">{{ $event->nama }}</p>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-1.5 tracking-tighter">{{ $event->kategori }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <p class="text-xs font-black text-slate-700 leading-none">{{ \Carbon\Carbon::parse($event->tanggal)->translatedFormat('d M Y') }}</p>
+                                <p class="text-[9px] text-blue-500 font-bold uppercase mt-1 tracking-tighter">{{ \Carbon\Carbon::parse($event->tanggal)->diffForHumans() }}</p>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-100">
+                                    {{ $event->status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end space-x-1">
+                                    <a href="{{ route('staff.events.edit', $event->id) }}" class="p-2 text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all" title="Edit">
+                                        <i class="fas fa-edit text-xs"></i>
+                                    </a>
+                                    <a href="{{ route('staff.events.show', $event->id) }}" class="p-2 text-slate-300 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all" title="Lihat">
+                                        <i class="fas fa-eye text-xs"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white border border-slate-200 rounded-[2rem] shadow-sm overflow-hidden flex flex-col h-full">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest">Pendaftaran Terbaru</h4>
+                    <span class="text-[9px] font-black px-2 py-1 bg-blue-600 text-white rounded-lg">{{ $recent_registrations->count() }} DATA</span>
+                </div>
+                <div class="flex-1 p-3 space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+                    @forelse($recent_registrations as $reg)
+                    <div class="p-4 hover:bg-slate-50 rounded-[1.5rem] transition-all border border-transparent hover:border-slate-100 group">
+                        <div class="flex items-center">
+                            <div class="h-10 w-10 bg-gradient-to-tr from-slate-100 to-slate-200 text-slate-600 rounded-xl flex items-center justify-center font-black text-xs group-hover:scale-95 transition-transform uppercase">
+                                {{ substr($reg->nama_lengkap, 0, 1) }}
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between items-start">
+                                    <p class="text-xs font-black text-slate-800 tracking-tight leading-none truncate w-24">{{ $reg->nama_lengkap }}</p>
+                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{{ \Carbon\Carbon::parse($reg->created_at)->diffForHumans() }}</span>
+                                </div>
+                                <p class="text-[9px] text-blue-500 font-bold mt-1.5 uppercase tracking-tighter">{{ Str::limit($reg->event_nama, 20) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="p-12 text-center">
+                        <div class="h-12 w-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3 text-slate-200">
+                            <i class="fas fa-user-clock text-xl"></i>
+                        </div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Belum ada data</p>
+                    </div>
+                    @endforelse
+                </div>
+                <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+                    <a href="{{ route('staff.registrations.index') }}" class="block text-center text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-[0.2em] transition-all">
+                        LIHAT SEMUA DATA <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+                               
 <style>
-/* Custom Styles for Dashboard */
-:root {
-    --primary-light: rgba(13, 110, 253, 0.1);
-    --success-light: rgba(25, 135, 84, 0.1);
-    --warning-light: rgba(255, 193, 7, 0.1);
-    --info-light: rgba(13, 202, 240, 0.1);
-}
-
-/* Stats Grid Layout */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
-
-.stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f0f0f0;
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-}
-
-.stat-icon-wrapper {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1rem;
-}
-
-.bg-primary-light { background-color: var(--primary-light); }
-.bg-success-light { background-color: var(--success-light); }
-.bg-warning-light { background-color: var(--warning-light); }
-.bg-info-light { background-color: var(--info-light); }
-
-.stat-icon-wrapper i {
-    font-size: 1.5rem;
-}
-
-.stat-label {
-    color: #6c757d;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #212529;
-    margin-bottom: 1rem;
-}
-
-.stat-action {
-    border-top: 1px solid #f0f0f0;
-    padding-top: 1rem;
-}
-
-.stat-link {
-    color: #0d6efd;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.875rem;
-    transition: color 0.2s;
-}
-
-.stat-link:hover {
-    color: #0a58ca;
-}
-
-.stat-meta {
-    margin-top: 0.5rem;
-}
-
-/* Event List Styles */
-.event-list {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-.event-item {
-    display: flex;
-    align-items: center;
-    padding: 1.25rem;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s;
-}
-
-.event-item:hover {
-    background-color: #f8f9fa;
-}
-
-.event-item:last-child {
-    border-bottom: none;
-}
-
-.event-date {
-    flex-shrink: 0;
-    width: 60px;
-    text-align: center;
-    margin-right: 1rem;
-}
-
-.event-day {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0d6efd;
-    line-height: 1;
-}
-
-.event-month {
-    font-size: 0.875rem;
-    color: #6c757d;
-    text-transform: uppercase;
-}
-
-.event-details {
-    flex-grow: 1;
-}
-
-.event-title {
-    font-weight: 600;
-    color: #212529;
-}
-
-.event-description {
-    font-size: 0.875rem;
-}
-
-.event-meta {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.event-actions {
-    flex-shrink: 0;
-}
-
-.btn-icon {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-}
-
-/* Registration List Styles */
-.registration-list {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.registration-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.registration-item:hover {
-    background-color: #f8f9fa;
-}
-
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #0d6efd, #6610f2);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    margin-right: 1rem;
-    flex-shrink: 0;
-}
-
-.registration-details {
-    flex-grow: 1;
-    min-width: 0;
-}
-
-.user-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-}
-
-.registration-status {
-    flex-shrink: 0;
-    margin-left: 0.5rem;
-}
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.status-approved {
-    background-color: rgba(25, 135, 84, 0.1);
-    color: #198754;
-}
-
-.status-pending {
-    background-color: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
-}
-
-.status-rejected {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-}
-
-/* Quick Actions Grid */
-.quick-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-}
-
-.quick-action {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1.25rem;
-    border-radius: 12px;
-    border: 1px solid #f0f0f0;
-    background: white;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.3s ease;
-}
-
-.quick-action:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    border-color: #dee2e6;
-}
-
-.action-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.75rem;
-    color: white;
-}
-
-.action-icon.bg-primary { background: linear-gradient(135deg, #0d6efd, #6610f2); }
-.action-icon.bg-success { background: linear-gradient(135deg, #198754, #20c997); }
-.action-icon.bg-warning { background: linear-gradient(135deg, #ffc107, #fd7e14); }
-.action-icon.bg-info { background: linear-gradient(135deg, #0dcaf0, #20c997); }
-
-.action-icon i {
-    font-size: 1.25rem;
-}
-
-.action-content {
-    text-align: center;
-}
-
-.action-content h6 {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: #212529;
-}
-
-.action-content small {
-    color: #6c757d;
-    font-size: 0.75rem;
-}
-
-/* Empty State */
-.empty-state {
-    padding: 2rem 1rem;
-}
-
-.empty-state i {
-    opacity: 0.5;
-}
-
-/* Scrollbar Styling */
-.event-list::-webkit-scrollbar,
-.registration-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.event-list::-webkit-scrollbar-track,
-.registration-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.event-list::-webkit-scrollbar-thumb,
-.registration-list::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 10px;
-}
-
-.event-list::-webkit-scrollbar-thumb:hover,
-.registration-list::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 992px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+    /* Animasi Entry */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-    
-    .quick-actions-grid {
-        grid-template-columns: 1fr;
+    .animate-fade-in {
+        animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-}
 
-@media (max-width: 768px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
+    /* Scrollbar Styling kustom agar lebih tipis */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
     }
-    
-    .event-item {
-        flex-direction: column;
-        align-items: flex-start;
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
     }
-    
-    .event-date {
-        margin-bottom: 1rem;
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
     }
-    
-    .event-actions {
-        margin-top: 1rem;
-        width: 100%;
-        justify-content: flex-end;
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1;
     }
-}
 </style>
 @endsection

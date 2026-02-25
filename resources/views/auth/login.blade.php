@@ -287,6 +287,21 @@
                         </div>
                     </div>
                     
+                    <!-- Register CTA on Left Side -->
+                    <div class="mt-4 p-6 glass-card rounded-2xl">
+                        <h3 class="text-xl font-bold text-white mb-3">Belum Punya Akun?</h3>
+                        <p class="text-white/80 mb-4">
+                            Bergabunglah dengan ribuan pelari lainnya. Daftar sekarang untuk mengikuti event dan mulai melacak perkembangan Anda!
+                        </p>
+                        <a 
+                            href="{{ route('register') }}"
+                            class="inline-flex items-center justify-center w-full py-3 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-xl transition-all group border border-white/30">
+                            <i class="fas fa-user-plus mr-3 group-hover:scale-110 transition-transform"></i>
+                            Daftar Akun Baru
+                            <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+                        </a>
+                    </div>
+                    
                     <!-- Quote Section -->
                     <div class="mt-auto glass-card p-6 rounded-2xl">
                         <div class="flex items-start">
@@ -307,10 +322,16 @@
                 <div class="form-content">
                     <!-- Mobile Header -->
                     <div class="lg:hidden mb-6">
-                        <a href="{{ url('/') }}" class="inline-flex items-center text-primary-600 hover:text-primary-800 mb-4 text-sm">
-                            <i class="fas fa-arrow-left mr-2"></i>
-                            Kembali ke Beranda
-                        </a>
+                        <div class="flex justify-between items-center mb-6">
+                            <a href="{{ url('/') }}" class="inline-flex items-center text-primary-600 hover:text-primary-800 text-sm">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Kembali ke Beranda
+                            </a>
+                            <a href="{{ route('register') }}" class="inline-flex items-center text-primary-600 hover:text-primary-800 text-sm">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                Daftar
+                            </a>
+                        </div>
                         <div class="text-center mb-4">
                             <div class="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl mb-3">
                                 <i class="fas fa-running text-white text-xl"></i>
@@ -513,6 +534,24 @@
                             </p>
                         </div>
                     </div>
+                    
+                    <!-- Additional Register Links -->
+                    <div class="mt-4 md:mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <a 
+                            href="{{ route('register') }}?type=staff"
+                            class="p-3 md:p-4 border border-gray-200 hover:border-primary-300 rounded-xl text-center group transition-all hover:shadow-md">
+                            <i class="fas fa-user-tie text-primary-500 text-lg mb-2 group-hover:scale-110 transition-transform"></i>
+                            <h4 class="font-semibold text-gray-800 text-sm md:text-base mb-1">Daftar sebagai Staff</h4>
+                            <p class="text-xs md:text-sm text-gray-600">Untuk panitia event</p>
+                        </a>
+                        <a 
+                            href="{{ route('register') }}?type=organizer"
+                            class="p-3 md:p-4 border border-gray-200 hover:border-secondary-300 rounded-xl text-center group transition-all hover:shadow-md">
+                            <i class="fas fa-calendar-alt text-secondary-500 text-lg mb-2 group-hover:scale-110 transition-transform"></i>
+                            <h4 class="font-semibold text-gray-800 text-sm md:text-base mb-1">Daftar sebagai Organizer</h4>
+                            <p class="text-xs md:text-sm text-gray-600">Untuk penyelenggara event</p>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -702,6 +741,12 @@
                 if (window.innerHeight < 600) {
                     mainContainer.style.minHeight = '100vh';
                 }
+            }
+            
+            // Check if coming from registration
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('registered')) {
+                showNotification('Pendaftaran berhasil! Silakan masuk dengan akun yang baru Anda buat.');
             }
         });
         

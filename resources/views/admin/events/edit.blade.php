@@ -171,9 +171,10 @@
                     </div>
 
                     <!-- Form -->
-                    <!-- PERBAIKAN DI SINI: TIDAK PAKAI @method('POST') -->
+                    <!-- PERBAIKAN: Gunakan @method('PUT') untuk update -->
                     <form method="POST" action="{{ route('admin.events.update', $event->id) }}" id="eventForm" novalidate>
                         @csrf
+                        @method('PUT') <!-- TAMBAHKAN INI -->
                         
                         <!-- Row 1: Nama & Kategori -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -281,7 +282,7 @@
                                            id="harga_reguler" 
                                            name="harga_reguler" 
                                            value="{{ old('harga_reguler', $event->harga_reguler ?? 0) }}"
-                                           min="10000"
+                                           min="0"
                                            step="1000"
                                            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200"
                                            placeholder="10000"
@@ -289,7 +290,7 @@
                                 </div>
                                 <div class="mt-2 text-xs text-gray-500 flex items-center">
                                     <i class="fas fa-money-bill-wave mr-2"></i>
-                                    Harga minimal Rp 10.000
+                                    Isi 0 untuk event gratis
                                 </div>
                                 @error('harga_reguler')
                                 <p class="mt-2 text-sm text-red-600 flex items-center">
